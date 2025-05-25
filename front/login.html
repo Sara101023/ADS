@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto de Venta - Inicio de Sesión</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f6fa;
+        }
+        
+        .login-box {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .login-box h2 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+        
+        .login-box img {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .login-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .error-message {
+            color: var(--danger-color);
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        .role-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .role-btn {
+            flex: 1;
+            padding: 10px;
+            margin: 0 5px;
+            background-color: #ecf0f1;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .role-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <img src="img/logo.png" alt="Logo Tienda">
+            <h2>Iniciar Sesión</h2>
+            
+            <div class="role-selector">
+                <button class="role-btn active" data-role="admin">Administrador</button>
+                <button class="role-btn" data-role="cashier">Cajero</button>
+                
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" placeholder="Ingrese su usuario" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" placeholder="Ingrese su contraseña" required>
+                </div>
+                
+                <div class="form-group" id="employeeNumberGroup" style="display: none;">
+                    <label for="employeeNumber">Número de Empleado</label>
+                    <input type="text" id="employeeNumber" placeholder="Ingrese su número de empleado">
+                </div>
+                
+                <button type="submit" class="login-btn">Ingresar</button>
+                <div class="error-message" id="errorMessage">Usuario o contraseña incorrectos</div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>

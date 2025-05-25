@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto de Venta - Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="img/logo.png" alt="Logo Tienda">
+                <h2>Mi Tienda</h2>
+            </div>
+            <nav class="menu">
+                <ul>
+                    <li class="active"><a href="index.html"><i class="icon dashboard"></i>Dashboard</a></li>
+                    <li><a href="ventas.html"><i class="icon sales"></i>Ventas</a></li>
+                    <li><a href="inventario.html"><i class="icon inventory"></i>Inventario</a></li>
+                    <li><a href="facturacion.html"><i class="icon billing"></i>Facturación</a></li>
+                    <li><a href="reportes.html"><i class="icon reports"></i>Reportes</a></li>
+                    <li><a href="promociones.html"><i class="icon promotions"></i>Promociones</a></li>
+                    <li><a href="usuarios.html"><i class="icon users"></i>Usuarios</a></li>
+                </ul>
+            </nav>
+            <div class="user-profile">
+                <img src="img/user-avatar.png" alt="Usuario">
+                <span>Administrador</span>
+                <button id="logout-btn">Cerrar sesión</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <h1>Dashboard</h1>
+                <div class="date-time">
+                    <span id="current-date"></span>
+                    <span id="current-time"></span>
+                </div>
+            </header>
+
+            <div class="cards-container">
+                <div class="card balance">
+                    <h3>Balance del Día</h3>
+                    <div class="amount">$20,670 <span>MXN</span></div>
+                    <div class="info">
+                        <span>Ventas: 45</span>
+                        <span>Productos: 120</span>
+                    </div>
+                </div>
+
+                <div class="card income">
+                    <h3>Ingresos</h3>
+                    <div class="amount">$2,080 <span>MXN</span></div>
+                    <div class="info">
+                        <span>Efectivo: $1,400</span>
+                        <span>Tarjeta: $680</span>
+                    </div>
+                </div>
+
+                <div class="card expenses">
+                    <h3>Gastos</h3>
+                    <div class="amount">$1,100 <span>MXN</span></div>
+                    <div class="info">
+                        <span>Proveedores: $800</span>
+                        <span>Otros: $300</span>
+                    </div>
+                </div>
+
+                <div class="card inventory-alerts">
+                    <h3>Alertas de Inventario</h3>
+                    <div class="amount">5 <span>Productos</span></div>
+                    <div class="alert-items">
+                        <span>Refrescos (Stock: 3)</span>
+                        <span>Galletas (Stock: 2)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart sales-chart">
+                    <h3>Ventas por Día</h3>
+                    <canvas id="salesChart"></canvas>
+                </div>
+                <div class="chart products-chart">
+                    <h3>Productos Más Vendidos</h3>
+                    <canvas id="productsChart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>
