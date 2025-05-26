@@ -107,4 +107,70 @@ document.addEventListener('DOMContentLoaded', function() {
 document.getElementById('logout-btn').addEventListener('click', function() {
     localStorage.removeItem('currentUser');
     window.location.href = 'login.html';
+
+    // 🕒 Actualizar fecha y hora
+function updateDateTime() {
+    const now = new Date();
+    const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const date = now.toLocaleDateString('es-MX', optionsDate);
+    const time = now.toLocaleTimeString('es-MX');
+
+    document.getElementById('current-date').textContent = date;
+    document.getElementById('current-time').textContent = time;
+}
+
+setInterval(updateDateTime, 1000);
+updateDateTime();
+
+// 📊 Gráfica de ventas por día
+const ctxSales = document.getElementById('salesChart').getContext('2d');
+const salesChart = new Chart(ctxSales, {
+    type: 'line',
+    data: {
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+        datasets: [{
+            label: 'Ventas (MXN)',
+            data: [1800, 2200, 1500, 1900, 2300, 1700, 2600],
+            borderColor: '#00ff85',
+            backgroundColor: 'rgba(0, 255, 133, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 5,
+            pointBackgroundColor: '#00ff85',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#333',
+                    font: { weight: 'bold' }
+                }
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    color: '#555'
+                },
+                grid: {
+                    display: false
+                }
+            },
+            y: {
+                ticks: {
+                    color: '#555',
+                    beginAtZero: true
+                },
+                grid: {
+                    color: '#eee'
+                }
+            }
+        }
+    }
+});
+
 });
