@@ -12,8 +12,10 @@
     --danger-color: #ff3c3c;
     --success-color: #00c853;
     --warning-color: #ffab00;
-    --sidebar-width: 250px;
-}
+    --sidebar-width: 250px;}
+
+
+
 
 /* Reset y base */
 * {
