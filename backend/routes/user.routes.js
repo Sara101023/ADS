@@ -1,18 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const userCtrl = require('../controllers/user.controller');
-const { auth } = require('../middleware/auth.middleware');
-const { isAdmin } = require('../middleware/role.middleware');
+const { verifyToken, checkAdmin } = require('../middlewares/auth.middleware');
 
-router.get('/', auth, isAdmin, userCtrl.getAllUsers);
-router.post('/', auth, isAdmin, userCtrl.createUser);
-router.put('/:id', auth, isAdmin, userCtrl.updateUser);
-router.delete('/:id', auth, isAdmin, userCtrl.deleteUser);
-router.post('/:id/reset-password', auth, isAdmin, userCtrl.resetPassword);
+// Rutas protegidas solo para administradores
+router.get('/', verifyToken, checkAdmin, userCtrl.getAllUsers);
+router.post('/', verifyToken, checkAdmin, userCtrl.createUser);
+router.put('/:id', verifyToken, checkAdmin, userCtrl.updateUser);
+router.delete('/:id', verifyToken, checkAdmin, userCtrl.deleteUser);
+router.post('/:id/reset-password', verifyToken, checkAdmin, userCtrl.resetPassword);
+
+// Obtener roles disponibles (para desplegarlos en el frontend)
+router.get('/roles', verifyToken, checkAdmin, userCtrl.getRoles);
 
 module.exports = router;
-
-
-const { verifyToken, checkAdmin } = require('../middleware/auth.middleware');
-
-router.get('/roles', verifyToken, checkAdmin, userCtrl.getRoles);

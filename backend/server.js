@@ -13,9 +13,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../front')));
 
 // Rutas de API
+app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/usuarios', require('./routes/user.routes'));
 
-// Otras rutas que no sean API redirigen al index del frontend
+// ⛔ ESTA RUTA SIEMPRE AL FINAL
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../front/index.html'));
 });
