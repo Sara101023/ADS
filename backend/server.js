@@ -12,12 +12,12 @@ app.use(express.json());
 // Servir archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, '../front')));
 
-// Rutas de API
+// Rutas de API (deben ir ANTES del catch-all)
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/usuarios', require('./routes/user.routes'));
 
-// ⛔ ESTA RUTA SIEMPRE AL FINAL
 app.get('*', (req, res) => {
+  // Solo responde con index.html si NO es una ruta de API
   res.sendFile(path.join(__dirname, '../front/index.html'));
 });
 

@@ -2,8 +2,12 @@
 function updateDateTime() {
     const now = new Date();
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('current-date').textContent = now.toLocaleDateString('es-MX', options);
-    document.getElementById('current-time').textContent = now.toLocaleTimeString('es-MX');
+    const dateEl = document.getElementById('current-date');
+const timeEl = document.getElementById('current-time');
+
+if (dateEl) dateEl.textContent = now.toLocaleDateString('es-MX', options);
+if (timeEl) timeEl.textContent = now.toLocaleTimeString('es-MX');
+
 }
 
 setInterval(updateDateTime, 1000);

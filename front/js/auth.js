@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    const numero_trabajador = document.getElementById('username').value;
+    const contrasena = document.getElementById('password').value;
 
     try {
       const response = await fetch('/api/auth/login', {
