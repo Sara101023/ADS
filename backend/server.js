@@ -1,27 +1,27 @@
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
+
 const app = express();
 const port = 4000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
 
 // Servir archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, '../front')));
 
-// Middleware para APIs (simuladas o reales)
-app.use(express.json());
+// Rutas de API
+app.use('/api/usuarios', require('./routes/user.routes'));
 
-// Ejemplo de API simulada
-app.get('/api/productos', (req, res) => {
-  res.json([
-    { id: 1, nombre: "Producto Demo", precio: 100 }
-  ]);
-});
-
-// Todas las rutas no-API redirigen al frontend
+// Otras rutas que no sean API redirigen al index del frontend
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../front/index.html'));
 });
 
+// Iniciar servidor
 app.listen(port, () => {
-  console.log(`Backend corriendo en http://localhost:${port}`);
-  console.log(`Frontend accesible en http://localhost:${port}/index.html`);
+  console.log(`✅ Backend corriendo en: http://localhost:${port}`);
+  console.log(`✅ Frontend visible en: http://localhost:${port}/index.html`);
 });
