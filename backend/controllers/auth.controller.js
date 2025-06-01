@@ -1,61 +1,81 @@
-const User = require('../models/user.model');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
-const jwtSecret = process.env.JWT_SECRET || 'secreto123';
+const User = require('../models/user.model');
+const jwtSecret = process.env.JWT_SECRET || 'secret_key';
 
 const authController = {
   login: async (req, res) => {
-    const { nombre, contrasena } = req.body;
-
-    if (!nombre || !contrasena) {
-      return res.status(400).json({ error: 'Nombre de usuario y contraseña son requeridos' });
-    }
-
     try {
-      const user = await User.findByNombre(nombre);
+      const { numero_trabajador, contrasena } = req.body;
 
+      // Validación básica
+      if (!numero_trabajador || !contrasena) {
+        return res.status(400).json({ error: 'Número de trabajador y contraseña son requeridos' });
+      }
+
+      // Buscar usuario por número de trabajador
+      const user = await User.findByNumeroTrabajador(numero_trabajador);
       if (!user) {
-        return res.status(401).json({ error: 'Usuario no encontrado' });
+        return res.status(401).json({ error: 'Credenciales inválidas' });
       }
 
-      const passwordMatch = await bcrypt.compare(contrasena, user.contrasena);
-      if (!passwordMatch) {
-        return res.status(401).json({ error: 'Contraseña incorrecta' });
+      // Comparar contraseña
+      const isMatch = await bcrypt.compare(contrasena, user.contrasena);
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Credenciales inválidas' });
       }
 
-      const payload = {
-        id: user.id_usuario,
-        nombre: user.nombre,
-        role: user.nombre_rol?.toLowerCase() || 'usuario'
-      };
+      // Crear token
+      const token = jwt.sign(
+        {
+          id: user.id_usuario,
+          role: user.nombre_rol,
+          nombre: user.nombre,
+          id_rol: user.id_rol
+        },
+        jwtSecret,
+        { expiresIn: '8h' }
+      );
 
-      const token = jwt.sign(payload, jwtSecret, { expiresIn: '8h' });
-
-      return res.json({
+      // Respuesta al frontend
+      res.json({
         token,
         user: {
           id: user.id_usuario,
           nombre: user.nombre,
-          role: user.nombre_rol
+          numero_trabajador: user.numero_trabajador,
+          rol: user.rol  // ← ESTE es el campo correcto
         }
       });
+
+
     } catch (error) {
       console.error('Error en login:', error);
-      return res.status(500).json({ error: 'Error del servidor' });
+      res.status(500).json({ error: 'Error en el servidor' });
     }
   },
 
   logout: (req, res) => {
-    res.json({ message: 'Logout exitoso' });
+    res.json({ message: 'Sesión cerrada correctamente' });
   },
 
-  getCurrentUser: (req, res) => {
-    if (!req.user) {
-      return res.status(401).json({ error: 'No autenticado' });
-    }
+  getCurrentUser: async (req, res) => {
+    try {
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      }
 
-    res.json({ user: req.user });
+      res.json({
+        id: user.id_usuario,
+        nombre: user.nombre,
+        numero_trabajador: user.numero_trabajador,
+        rol: user.nombre_rol
+      });
+    } catch (error) {
+      console.error('Error al obtener usuario:', error);
+      res.status(500).json({ error: 'Error en el servidor' });
+    }
   }
 };
 
