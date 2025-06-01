@@ -1,180 +1,187 @@
-// Actualizar fecha y hora
+// =============================================
+// FUNCIÓN PARA ACTUALIZAR FECHA Y HORA
+// =============================================
 function updateDateTime() {
     const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const dateOptions = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    };
+    
     const dateEl = document.getElementById('current-date');
-const timeEl = document.getElementById('current-time');
+    const timeEl = document.getElementById('current-time');
 
-if (dateEl) dateEl.textContent = now.toLocaleDateString('es-MX', options);
-if (timeEl) timeEl.textContent = now.toLocaleTimeString('es-MX');
-
+    if (dateEl) {
+        dateEl.textContent = now.toLocaleDateString('es-MX', dateOptions);
+    }
+    
+    if (timeEl) {
+        timeEl.textContent = now.toLocaleTimeString('es-MX', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    }
 }
 
+// Iniciar la actualización de fecha y hora
 setInterval(updateDateTime, 1000);
-updateDateTime();
+updateDateTime(); // Llamada inicial
 
-// Inicializar gráficos
+// =============================================
+// INICIALIZACIÓN CUANDO EL DOM ESTÉ LISTO
+// =============================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Gráfico de ventas
-    const salesCtx = document.getElementById('salesChart').getContext('2d');
-    const salesChart = new Chart(salesCtx, {
-        type: 'line',
-        data: {
-            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-            datasets: [{
-                label: 'Ventas',
-                data: [1200, 1900, 1500, 2000, 2500, 2200, 3000],
-                backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                borderColor: 'rgba(52, 152, 219, 1)',
-                borderWidth: 2,
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    // Gráfico de productos
-    const productsCtx = document.getElementById('productsChart').getContext('2d');
-    const productsChart = new Chart(productsCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Refrescos', 'Botanas', 'Lácteos', 'Panadería', 'Abarrotes'],
-            datasets: [{
-                data: [35, 25, 15, 10, 15],
-                backgroundColor: [
-                    '#3498db',
-                    '#2ecc71',
-                    '#f39c12',
-                    '#e74c3c',
-                    '#9b59b6'
-                ],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'right'
-                }
-            }
-        }
-    });
-});
-
-// Verificar autenticación
-document.addEventListener('DOMContentLoaded', function() {
+    // =========================================
+    // VERIFICACIÓN DE AUTENTICACIÓN
+    // =========================================
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const isLoginPage = window.location.pathname.endsWith('login.html');
     
-    if (!currentUser) {
+    // Redirigir si no hay usuario y no está en página de login
+    if (!currentUser && !isLoginPage) {
         window.location.href = 'login.html';
-    } else {
-        // Mostrar información del usuario
-        document.querySelector('.user-profile span').textContent = currentUser.name;
+        return;
+    }
+    
+    // Redirigir si hay usuario pero está en página de login
+    if (currentUser && isLoginPage) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    // Si llegamos aquí, hay usuario y no es página de login
+    // =========================================
+    // CONFIGURACIÓN DE INTERFAZ DE USUARIO
+    // =========================================
+    const userProfile = document.querySelector('.user-profile span');
+    if (userProfile) {
+        userProfile.textContent = currentUser.name;
+    }
+
+    // =========================================
+    // FILTRADO DE MÓDULOS SEGÚN ROL
+    // =========================================
+    const menuItems = document.querySelectorAll('.menu li');
+    menuItems.forEach(item => {
+        const link = item.querySelector('a')?.getAttribute('href');
         
-        // Mostrar solo los módulos según el rol
-        const menuItems = document.querySelectorAll('.menu li');
-        
-        menuItems.forEach(item => {
-            const link = item.querySelector('a').getAttribute('href');
-            
-            // Ocultar módulos según el rol
-            if (currentUser.role === 'cajero') {
-                if (link === 'usuarios.html' || link === 'reportes.html' || link === 'promociones.html') {
-                    item.style.display = 'none';
-                }
-            } else if (currentUser.role === 'facturador') {
-                if (link === 'usuarios.html' || link === 'inventario.html' || link === 'promociones.html') {
-                    item.style.display = 'none';
+        if (currentUser.role === 'cajero') {
+            if (link && ['usuarios.html', 'reportes.html', 'promociones.html'].includes(link)) {
+                item.style.display = 'none';
+            }
+        } else if (currentUser.role === 'facturador') {
+            if (link && ['usuarios.html', 'inventario.html', 'promociones.html'].includes(link)) {
+                item.style.display = 'none';
+            }
+        }
+    });
+
+    // =========================================
+    // INICIALIZACIÓN DE GRÁFICOS
+    // =========================================
+    
+    // Gráfico de Ventas
+    const salesCtx = document.getElementById('salesChart');
+    if (salesCtx) {
+        new Chart(salesCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                datasets: [{
+                    label: 'Ventas ($)',
+                    data: [1800, 2200, 1500, 1900, 2300, 1700, 2600],
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#3498db',
+                    pointBorderColor: '#fff',
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `$${context.raw.toLocaleString('es-MX')}`;
+                            }
+                        }
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return `$${value}`;
+                            }
+                        }
+                    }
                 }
             }
         });
     }
-});
 
-// Cerrar sesión
-document.getElementById('logout-btn').addEventListener('click', function() {
-    localStorage.removeItem('currentUser');
-    window.location.href = 'login.html';
-
-    // 🕒 Actualizar fecha y hora
-function updateDateTime() {
-    const now = new Date();
-    const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const date = now.toLocaleDateString('es-MX', optionsDate);
-    const time = now.toLocaleTimeString('es-MX');
-
-    document.getElementById('current-date').textContent = date;
-    document.getElementById('current-time').textContent = time;
-}
-
-setInterval(updateDateTime, 1000);
-updateDateTime();
-
-// 📊 Gráfica de ventas por día
-const ctxSales = document.getElementById('salesChart').getContext('2d');
-const salesChart = new Chart(ctxSales, {
-    type: 'line',
-    data: {
-        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-        datasets: [{
-            label: 'Ventas (MXN)',
-            data: [1800, 2200, 1500, 1900, 2300, 1700, 2600],
-            borderColor: '#00ff85',
-            backgroundColor: 'rgba(0, 255, 133, 0.1)',
-            tension: 0.4,
-            fill: true,
-            pointRadius: 5,
-            pointBackgroundColor: '#00ff85',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                labels: {
-                    color: '#333',
-                    font: { weight: 'bold' }
-                }
-            }
-        },
-        scales: {
-            x: {
-                ticks: {
-                    color: '#555'
-                },
-                grid: {
-                    display: false
-                }
+    // Gráfico de Productos
+    const productsCtx = document.getElementById('productsChart');
+    if (productsCtx) {
+        new Chart(productsCtx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Refrescos', 'Botanas', 'Lácteos', 'Panadería', 'Abarrotes'],
+                datasets: [{
+                    data: [35, 25, 15, 10, 15],
+                    backgroundColor: [
+                        '#3498db',
+                        '#2ecc71',
+                        '#f39c12',
+                        '#e74c3c',
+                        '#9b59b6'
+                    ],
+                    borderWidth: 0
+                }]
             },
-            y: {
-                ticks: {
-                    color: '#555',
-                    beginAtZero: true
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 15,
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
                 },
-                grid: {
-                    color: '#eee'
-                }
+                cutout: '70%'
             }
-        }
+        });
     }
-});
 
+    // =========================================
+    // MANEJADOR DE CIERRE DE SESIÓN
+    // =========================================
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        });
+    }
 });

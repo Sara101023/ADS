@@ -6,7 +6,7 @@
     <title>Punto de Venta - Inicio de Sesión</title>
     <link rel="stylesheet" href="css/estilos.css">
     <style>
-        .login-container {
+         .login-container {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -113,14 +113,14 @@
             <h2>Iniciar Sesión</h2>
             
             <div class="role-selector">
-                <button class="role-btn active" data-role="admin">Administrador</button>
-                <button class="role-btn" data-role="cashier">Cajero</button>
-                
+                <button type="button" class="role-btn active" data-role="Admin">Administrador</button>
+                <button type="button" class="role-btn" data-role="cajero">Cajero</button>
             </div>
+            <input type="hidden" id="selectedRole" value="administrador"> <!-- Campo oculto para el rol -->
             
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="username">Usuario</label>
+                    <label for="numero_trabajador">Usuario</label>
                     <input type="text" id="numero_trabajador" placeholder="Ingrese su usuario" required>
                 </div>
                 
@@ -142,7 +142,6 @@
 
     <script src="js/auth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="js/main.js"></script>
-
+    <script src="js/main.js"></script>
 </body>
 </html>

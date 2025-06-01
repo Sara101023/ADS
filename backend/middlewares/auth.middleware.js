@@ -1,50 +1,58 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/user.model');
 
 const jwtSecret = process.env.JWT_SECRET || 'secreto123';
 
 const authMiddleware = {
-  // Verifica si el token JWT es válido
-  verifyToken: (req, res, next) => {
-    const token = req.headers['authorization']?.split(' ')[1];
+  verifyToken: async (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+
+    if (!authHeader) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+
+    // El token debe venir como "Bearer <token>"
+    const token = authHeader.split(' ')[1];
     if (!token) {
-      return res.status(401).json({ error: 'Token no proporcionado' });
+      return res.status(401).json({ message: 'Invalid token format' });
     }
 
     try {
+      // Verificar y decodificar token
       const decoded = jwt.verify(token, jwtSecret);
-      req.user = decoded; // Guarda la info del usuario (incluye el rol) en la request
+
+      // Opcional: cargar datos completos del usuario desde DB si quieres más info
+      const user = await User.findById(decoded.id);
+      if (!user) {
+        return res.status(401).json({ message: 'User not found' });
+      }
+
+      // Adjuntar datos de usuario a req
+      req.user = {
+        id: user.id_usuario,
+        nombre: user.nombre,
+        role: user.nombre_rol.toLowerCase(),
+      };
+
       next();
     } catch (error) {
-      console.error('Error al verificar token:', error);
-      return res.status(401).json({ error: 'Token inválido' });
+      console.error('Token verification failed:', error);
+      return res.status(401).json({ message: 'Unauthorized' });
     }
   },
 
-  // Verifica si el usuario tiene un rol permitido (admin, cajero, etc.)
-  checkRole: (roles) => {
-    return (req, res, next) => {
-      if (!req.user || !roles.includes(req.user.role)) {
-        return res.status(403).json({ error: 'No autorizado' });
-      }
-      next();
-    };
-  },
-
-  // Acceso exclusivo para administradores
+  // Middleware para checar si el usuario es admin
   checkAdmin: (req, res, next) => {
-    if (req.user?.role !== 'administrador') {
-      return res.status(403).json({ error: 'No autorizado' });
+    if (!req.user) {
+      return res.status(401).json({ message: 'No autorizado' });
     }
+
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'No tienes permisos para esta acción' });
+    }
+
     next();
   },
-
-  // Acceso para cajeros y administradores
-  checkCashier: (req, res, next) => {
-    if (!['cajero', 'administrador'].includes(req.user?.role)) {
-      return res.status(403).json({ error: 'No autorizado' });
-    }
-    next();
-  }
 };
 
 module.exports = authMiddleware;

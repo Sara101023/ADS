@@ -1,78 +1,62 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
-const jwtSecret = process.env.JWT_SECRET || 'secret_key';
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+const jwtSecret = process.env.JWT_SECRET || 'secreto123';
 
 const authController = {
-    login: async (req, res) => {
-        try {
-            const { numero_trabajador, contrasena } = req.body;
-            
-            if (!numero_trabajador || !contrasena) {
-                return res.status(400).json({ error: 'Número de trabajador y contraseña son requeridos' });
-            }
-            
-            // Buscar usuario
-            const user = await User.findByNumeroTrabajador(numero_trabajador);
-            if (!user) {
-                return res.status(401).json({ error: 'Credenciales inválidas' });
-            }
+  login: async (req, res) => {
+    const { nombre, contrasena } = req.body;
 
-            // Verificar contraseña
-            const isMatch = await bcrypt.compare(contrasena, user.contrasena);
-            if (!isMatch) {
-                return res.status(401).json({ error: 'Credenciales inválidas' });
-            }
-
-            // Generar token
-            const token = jwt.sign(
-                {
-                    id: user.id_usuario,
-                    role: user.nombre_rol,
-                    nombre: user.nombre,
-                    id_rol: user.id_rol
-                },
-                jwtSecret,
-                { expiresIn: '8h' }
-            );
-
-            res.json({
-                token,
-                user: {
-                    id: user.id_usuario,
-                    nombre: user.nombre,
-                    numero_trabajador: user.numero_trabajador,
-                    rol: user.nombre_rol
-                }
-            });
-        } catch (error) {
-            console.error('Error en login:', error);
-            res.status(500).json({ error: 'Error en el servidor' });
-        }
-    },
-
-    logout: (req, res) => {
-        res.json({ message: 'Sesión cerrada correctamente' });
-    },
-
-    getCurrentUser: async (req, res) => {
-        try {
-            const user = await User.findById(req.user.id);
-            if (!user) {
-                return res.status(404).json({ error: 'Usuario no encontrado' });
-            }
-
-            res.json({
-                id: user.id_usuario,
-                nombre: user.nombre,
-                numero_trabajador: user.numero_trabajador,
-                rol: user.nombre_rol
-            });
-        } catch (error) {
-            console.error('Error al obtener usuario:', error);
-            res.status(500).json({ error: 'Error en el servidor' });
-        }
+    if (!nombre || !contrasena) {
+      return res.status(400).json({ error: 'Nombre de usuario y contraseña son requeridos' });
     }
+
+    try {
+      const user = await User.findByNombre(nombre);
+
+      if (!user) {
+        return res.status(401).json({ error: 'Usuario no encontrado' });
+      }
+
+      const passwordMatch = await bcrypt.compare(contrasena, user.contrasena);
+      if (!passwordMatch) {
+        return res.status(401).json({ error: 'Contraseña incorrecta' });
+      }
+
+      const payload = {
+        id: user.id_usuario,
+        nombre: user.nombre,
+        role: user.nombre_rol?.toLowerCase() || 'usuario'
+      };
+
+      const token = jwt.sign(payload, jwtSecret, { expiresIn: '8h' });
+
+      return res.json({
+        token,
+        user: {
+          id: user.id_usuario,
+          nombre: user.nombre,
+          role: user.nombre_rol
+        }
+      });
+    } catch (error) {
+      console.error('Error en login:', error);
+      return res.status(500).json({ error: 'Error del servidor' });
+    }
+  },
+
+  logout: (req, res) => {
+    res.json({ message: 'Logout exitoso' });
+  },
+
+  getCurrentUser: (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'No autenticado' });
+    }
+
+    res.json({ user: req.user });
+  }
 };
 
 module.exports = authController;
