@@ -397,10 +397,16 @@
 </head>
 
 <body>
-  <!-- Banner de invitado -->
-  <div class="guest-mode-banner" id="guestBanner" style="display: none;">
-    <p>Estás comprando como invitado. <a href="login.html">Inicia sesión</a> para más funciones.</p>
-  </div>
+   <nav class="menu">
+                <ul>
+                    <li><a href="index.html"><i class="icon fas fa-chart-line"></i>General</a></li>
+                    <li><a href="ventasCajero.html"><i class="icon fas fa-shopping-cart"></i>Ventas</a></li>
+                    <li><a href="inventario.html"><i class="icon fas fa-boxes"></i>Inventario</a></li>
+                    <li><a href="reportes.html"><i class="icon fas fa-chart-pie"></i>Reportes</a></li>
+                    <li class="active"><a href="promociones.html"><i class="icon fas fa-tag"></i>Promociones</a></li>
+                    <li><a href="usuarios.html"><i class="icon fas fa-users"></i>Usuarios</a></li>
+                </ul>
+            </nav>
 
   <!-- Contenedor principal -->
   <div class="dashboard-container">
@@ -537,12 +543,7 @@ updateDateTime();
     setInterval(updateDateTime, 1000);
     updateDateTime(); // Llamar inmediatamente
     
-    // Ejemplo de funcionalidad para el botón de invitado
-    document.getElementById('guestBtn').addEventListener('click', function(e) {
-      e.preventDefault();
-      const guestBanner = document.getElementById('guestBanner');
-      guestBanner.style.display = guestBanner.style.display === 'none' ? 'block' : 'none';
-    });
+    
   </script>
 </body>
 

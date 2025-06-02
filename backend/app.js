@@ -23,6 +23,6 @@ app.get('*', (req, res) => {
 
 // Iniciar servidor
 app.listen(port, () => {
-  console.log(`✅ Servidor backend escuchando en: http://localhost:${port}`);
-  console.log(`🌐 Frontend disponible en: http://localhost:${port}/login.html`);
+  console.log(` Servidor backend escuchando en: http://localhost:${port}`);
+  console.log(` Frontend disponible en: http://localhost:${port}/login.html`);
 });

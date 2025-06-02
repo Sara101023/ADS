@@ -6,7 +6,6 @@ const products = [
         price: 18.50,
         category: 'Bebidas',
         stock: 25,
-        //image: 'img/products/cola.jpg',
         barcode: '7501055301007',
         hasPromotion: true,
         promotionType: '3x2'
@@ -17,8 +16,6 @@ const products = [
         price: 12.00,
         category: 'Botanas',
         stock: 15,
-       
-       // image: 'img/products/galletas.jpg',
         barcode: '7500435123456',
         hasPromotion: false
     },
@@ -28,7 +25,6 @@ const products = [
         price: 22.50,
         category: 'Lácteos',
         stock: 8,
-       // image: 'img/products/leche.jpg',
         barcode: '7501035911200',
         hasPromotion: false
     },
@@ -38,7 +34,6 @@ const products = [
         price: 30.00,
         category: 'Panadería',
         stock: 10,
-       // image: 'img/products/pan.jpg',
         barcode: '7501055302004',
         hasPromotion: true,
         promotionType: '2x1'
@@ -49,7 +44,6 @@ const products = [
         price: 25.00,
         category: 'Abarrotes',
         stock: 12,
-       // image: 'img/products/arroz.jpg',
         barcode: '7501055303001',
         hasPromotion: false
     },
@@ -59,7 +53,6 @@ const products = [
         price: 35.00,
         category: 'Abarrotes',
         stock: 7,
-       // image: 'img/products/aceite.jpg',
         barcode: '7501055304008',
         hasPromotion: false
     },
@@ -69,7 +62,6 @@ const products = [
         price: 45.00,
         category: 'Abarrotes',
         stock: 5,
-       // image: 'img/products/jabon.jpg',
         barcode: '7501055305005',
         hasPromotion: false
     },
@@ -79,7 +71,7 @@ const products = [
         price: 15.00,
         category: 'Bebidas',
         stock: 20,
-       // image: 'img/products/agua.jpg',
+
         barcode: '7501055306002',
         hasPromotion: true,
         promotionType: '3x1'
@@ -141,17 +133,16 @@ function loadCart() {
 
 // Actualizar fecha y hora
 function updateDateTime() {
-    const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    
-    if(document.getElementById('current-date')) {
-        document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', options);
-    }
-    
-    if(document.getElementById('current-time')) {
-        document.getElementById('current-time').textContent = now.toLocaleTimeString('es-ES');
-    }
+  const now = new Date();
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const dateEl = document.getElementById('current-date');
+  const timeEl = document.getElementById('current-time');
+
+  if (dateEl) dateEl.textContent = now.toLocaleDateString('es-MX', options);
+  if (timeEl) timeEl.textContent = now.toLocaleTimeString('es-MX');
 }
+setInterval(updateDateTime, 1000);
+updateDateTime();
 
 // Cargar productos en la cuadrícula
 function loadProducts() {
@@ -177,7 +168,6 @@ function loadProducts() {
         
         productCard.innerHTML = `
             ${promotionBadge}
-          //  <img src="${product.image}" alt="${product.name}" onerror="this.src='img/products/default.jpg'">
             <h4>${product.name}</h4>
             <div class="price">$${product.price.toFixed(2)}</div>
             <div class="stock">Disponibles: ${product.stock}</div>

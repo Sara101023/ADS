@@ -61,11 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.style.display = 'none';
         promoForm.reset();
         
-        // En una aplicación real, aquí harías:
-        // 1. Recoger los datos del formulario
-        // 2. Validarlos
-        // 3. Enviarlos al servidor via AJAX
-        // 4. Actualizar la tabla si la respuesta es exitosa
+      
     });
     
     // Manejar botones de editar y eliminar (deberías implementar lógica real)
