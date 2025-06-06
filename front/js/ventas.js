@@ -430,7 +430,7 @@ function guestCheckout() {
     const confirmMessage = `Resumen de compra:\n\n${itemsSummary}\nSubtotal: $${subtotal.toFixed(2)}\nIVA: $${iva.toFixed(2)}\nTotal: $${total.toFixed(2)}\n\nMétodo de pago: ${paymentMethod === 'cash' ? 'Efectivo' : 'Tarjeta'}\n\n¿Confirmar compra?`;
     
     if(confirm(confirmMessage)) {
-        // En un sistema real, aquí enviarías los datos al servidor
+        // En un sistema real, aquí se va a enviar los datos al servidor
         const saleData = {
             customer: { name: customerName, email: customerEmail },
             items: cart,
