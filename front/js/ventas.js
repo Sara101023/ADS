@@ -597,7 +597,7 @@ function abrirModal() {
     document.getElementById("emailModal").style.display = "flex";
 }
 
-
+/*
 function procesarVenta(nombre, correo, metodoPago) {
   let subtotal = 0;
   let resumen = "";
@@ -620,6 +620,47 @@ function procesarVenta(nombre, correo, metodoPago) {
     if (data.status === 'ok') {
       alert(`¡Gracias por tu compra, ${nombre}!\nSe envió el recibo a ${correo}`);
       cerrarModal();
+      clearCart();
+    } else {
+      alert("Error al enviar el correo.");
+    }
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    alert("No se pudo enviar el correo.");
+  });
+}
+*/
+
+function procesarVenta(nombre, correo, metodoPago) {
+  let subtotal = 0;
+  let resumen = "";
+
+  cart.forEach(item => {
+    const itemTotal = calculateItemTotal(item);
+    subtotal += itemTotal;
+    resumen += `${item.product.name} x ${item.quantity} = $${itemTotal.toFixed(2)}\n`;
+  });
+
+  const total = (subtotal * 1.16).toFixed(2);
+
+  fetch("/enviar-correo", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nombre, correo, resumen, total })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 'ok') {
+      
+      const modalContent = document.querySelector("#emailModal .modal-content");
+      modalContent.innerHTML = `
+        <span class="close-btn" onclick="cerrarModal()">×</span>
+        <h2>🎉 ¡Gracias por tu compra, ${nombre}🎉!</h2>
+        <p>Tu ticket ha sido enviado a <strong>${correo}</strong>.</p>
+        <p>Esperamos volver a verte pronto 😃🤙</p>
+        <button style="margin-top: 20px;" onclick="cerrarModal()">Cerrar</button>
+      `;
       clearCart();
     } else {
       alert("Error al enviar el correo.");
