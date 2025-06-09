@@ -216,5 +216,51 @@
             window.location.href = 'ventas.html?guest=true';
         });
     </script>
+    
+    <script>
+    let rolSeleccionado = null;
+
+    function selectRole(rol) {
+        rolSeleccionado = rol;
+
+        // Opcional: destacar botón seleccionado visualmente
+        document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('selected'));
+        if (rol === 'admin') {
+            document.querySelector('.admin-btn').classList.add('selected');
+        } else if (rol === 'cashier') {
+            document.querySelector('.cashier-btn').classList.add('selected');
+        }
+    }
+
+    document.getElementById('guestBtn').addEventListener('click', function () {
+        window.location.href = 'ventas.html?guest=true';
+    });
+
+    // Controlar envío del login
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const usuario = document.getElementById('numero_trabajador').value;
+        const password = document.getElementById('password').value;
+
+        // Aquí iría la validación real (puede ser con PHP, por ejemplo)
+        // Por ahora simulamos éxito si usuario = "admin" o "cajero"
+        if ((usuario === 'admin' && password === '1234' && rolSeleccionado === 'admin') ||
+            (usuario === 'cajero' && password === '1234' && rolSeleccionado === 'cashier')) {
+
+            localStorage.setItem('usuario', usuario);
+            localStorage.setItem('rol', rolSeleccionado);
+
+            if (rolSeleccionado === 'admin') {
+                window.location.href = 'index.html';
+            } else if (rolSeleccionado === 'cashier') {
+                window.location.href = 'cajero.html';
+            }
+        } else {
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+    });
+</script>
+
 </body>
 </html>

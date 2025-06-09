@@ -78,11 +78,12 @@ const products = [
     }
 ];
 
-// Variables globales
 let cart = [];
 let currentCategory = 'Todos';
 const urlParams = new URLSearchParams(window.location.search);
-const isGuest = urlParams.has('guest') || !localStorage.getItem('userLoggedIn');
+const isGuest = urlParams.get('guest') === 'true';
+
+
 
 // Cargar productos al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
@@ -243,6 +244,7 @@ function setupEventListeners() {
             window.location.href = 'login.html';
         });
     }
+    
 }
 
 // Agregar producto al carrito
@@ -399,62 +401,7 @@ function updateTotals() {
     }
 }
 
-// Proceso de compra para invitados
-function guestCheckout() {
-    const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || 'efectivo';
-    
-    // Mostrar formulario simplificado
-    const customerName = prompt("Por favor ingresa tu nombre para la compra:");
-    if(!customerName) return;
-    
-    const customerEmail = prompt("Ingresa tu correo electrónico para el recibo:");
-    if(!customerEmail || !/^\S+@\S+\.\S+$/.test(customerEmail)) {
-        alert('Por favor ingresa un correo electrónico válido');
-        return;
-    }
-    
-    // Calcular totales
-    let subtotal = 0;
-    let itemsSummary = "";
-    
-    cart.forEach(item => {
-        let itemTotal = calculateItemTotal(item);
-        subtotal += itemTotal;
-        itemsSummary += `${item.product.name} x ${item.quantity} = $${itemTotal.toFixed(2)}\n`;
-    });
-    
-    const iva = subtotal * 0.16;
-    const total = subtotal + iva;
-    
-    // Mostrar resumen y confirmar
-    const confirmMessage = `Resumen de compra:\n\n${itemsSummary}\nSubtotal: $${subtotal.toFixed(2)}\nIVA: $${iva.toFixed(2)}\nTotal: $${total.toFixed(2)}\n\nMétodo de pago: ${paymentMethod === 'cash' ? 'Efectivo' : 'Tarjeta'}\n\n¿Confirmar compra?`;
-    
-    if(confirm(confirmMessage)) {
-        // En un sistema real, aquí se va a enviar los datos al servidor
-        const saleData = {
-            customer: { name: customerName, email: customerEmail },
-            items: cart,
-            subtotal: subtotal,
-            iva: iva,
-            total: total,
-            paymentMethod: paymentMethod,
-            date: new Date().toISOString()
-        };
-        
-        console.log('Datos de venta:', saleData); // Solo para depuración
-        
-        alert(`¡Gracias por tu compra, ${customerName}!\nSe ha enviado el recibo a ${customerEmail}`);
-        
-        // Opcional: ofrecer crear cuenta
-        if(confirm('¿Deseas crear una cuenta para futuras compras?')) {
-            localStorage.setItem('guestCartData', JSON.stringify(saleData));
-            window.location.href = 'registro.html';
-        }
-        
-        // Limpiar carrito
-        clearCart();
-    }
-}
+
 
 // Calcular total por ítem
 function calculateItemTotal(item) {
@@ -556,4 +503,130 @@ function completeSale() {
             });
         }
     }
+}
+// Funciones para mostrar/ocultar el modal de correo
+function abrirModal() {
+    document.getElementById('emailModal').style.display = 'flex';
+}
+
+function cerrarModal() {
+    document.getElementById('emailModal').style.display = 'none';
+}
+
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const emailForm = document.getElementById('emailForm');
+    const enviarBtn = document.getElementById("enviarBtn");
+    const cancelarBtn = document.getElementById("cancelarBtn");
+
+    // Botón "Cancelar" cierra el modal
+    if (cancelarBtn) {
+        cancelarBtn.addEventListener("click", cerrarModal);
+    }
+
+    // Botón "Enviar" procesa la compra
+    if (enviarBtn) {
+        enviarBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            const nombre = document.getElementById('nombre').value.trim();
+            const correo = document.getElementById('correo').value.trim();
+
+            if (!nombre || !correo) {
+                alert("Por favor completa todos los campos.");
+                return;
+            }
+
+            const emailRegex = /^[\w.-]+@[\w.-]+\.\w{2,}$/;
+            if (!emailRegex.test(correo)) {
+                alert("Por favor ingresa un correo electrónico válido.");
+                return;
+            }
+
+            // Detectar método de pago seleccionado
+            const metodoPago = document.querySelector('input[name="payment"]:checked')?.value || 'Efectivo';
+
+            // Procesar venta con los datos
+            procesarVenta(nombre, correo, metodoPago);
+        });
+    }
+});
+
+
+
+function abrirModal() {
+  document.getElementById("emailModal").style.display = "flex";
+}
+
+function cerrarModal() {
+  document.getElementById("emailModal").style.display = "none";
+}
+
+function enviarCorreo() {
+  const nombre = document.getElementById("nombre").value.trim();
+  const correo = document.getElementById("correo").value.trim();
+  const metodoPago = document.querySelector('input[name="payment"]:checked')?.value || 'efectivo';
+
+  const emailRegex = /^[\w.-]+@[\w.-]+\.\w{2,}$/;
+  if (!nombre || !emailRegex.test(correo)) {
+    alert("Datos inválidos.");
+    return;
+  }
+
+  procesarVenta(nombre, correo, metodoPago);
+}
+
+function guestCheckout() {
+    const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || 'efectivo';
+
+    if (paymentMethod === 'card') {
+        // Mostrar modal solo al hacer clic en "Finalizar Venta" con tarjeta
+        abrirModal();
+        return;
+    }
+
+    // Si el método es efectivo, se procesa la venta directo
+    const nombre = "Invitado";
+    const correo = "noreply@ventas.com";
+    procesarVenta(nombre, correo, paymentMethod);
+}
+function abrirModal() {
+    console.log("Se activó abrirModal()");
+    document.getElementById("emailModal").style.display = "flex";
+}
+
+
+function procesarVenta(nombre, correo, metodoPago) {
+  let subtotal = 0;
+  let resumen = "";
+
+  cart.forEach(item => {
+    const itemTotal = calculateItemTotal(item);
+    subtotal += itemTotal;
+    resumen += `${item.product.name} x ${item.quantity} = $${itemTotal.toFixed(2)}\n`;
+  });
+
+  const total = (subtotal * 1.16).toFixed(2);
+
+  fetch("/enviar-correo", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nombre, correo, resumen, total })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 'ok') {
+      alert(`¡Gracias por tu compra, ${nombre}!\nSe envió el recibo a ${correo}`);
+      cerrarModal();
+      clearCart();
+    } else {
+      alert("Error al enviar el correo.");
+    }
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    alert("No se pudo enviar el correo.");
+  });
 }

@@ -2,67 +2,67 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Ventas</title>
-    <link rel="stylesheet" href="css/estilos.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
-            --accent-color: #00ff85;
-            --danger-color: #e74c3c;
-            --dark-color: #000000;
-            --light-color: #ecf0f1;
-            --text-color: #000000;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Ventas</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --secondary-color: #2c3e50;
+      --accent-color: #00ff85;
+      --danger-color: #e74c3c;
+      --dark-color: #000000;
+      --light-color: #ecf0f1;
+      --text-color: #000000;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-           font-family: 'Poppins', sans-serif;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
 
-        body {
-            background-color: #f5f6fa;
-            color: var(--text-color);
-            line-height: 1.6;
-        }
+    body {
+      background-color: #f5f6fa;
+      color: var(--text-color);
+      line-height: 1.6;
+    }
 
-        /* Estilos para el banner de invitado */
-        .guest-mode-banner {
-            background-color: #fff3cd;
-            color: #856404;
-            padding: 10px 20px;
-            text-align: center;
-            border-bottom: 1px solid #ffeeba;
-        }
+    /* Estilos para el banner de invitado */
+    .guest-mode-banner {
+      background-color: #fff3cd;
+      color: #856404;
+      padding: 10px 20px;
+      text-align: center;
+      border-bottom: 1px solid #ffeeba;
+    }
 
-        .guest-mode-banner a {
-            color: var(--primary-color);
-            font-weight: 500;
-            text-decoration: none;
-        }
+    .guest-mode-banner a {
+      color: var(--primary-color);
+      font-weight: 500;
+      text-decoration: none;
+    }
 
-        .guest-mode-banner a:hover {
-            text-decoration: underline;
-        }
+    .guest-mode-banner a:hover {
+      text-decoration: underline;
+    }
 
-        /* Contenedor principal del dashboard */
-        .dashboard-container {
-            display: flex;
-            min-height: 100vh;
-        }
+    /* Contenedor principal del dashboard */
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+    }
 
-        /* Contenido principal */
-        .main-content {
-            flex: 1;
-            padding: 20px;
-        }
+    /* Contenido principal */
+    .main-content {
+      flex: 1;
+      padding: 20px;
+    }
 
-        /* Encabezado 
+    /* Encabezado 
         .header {
             display: flex;
             justify-content: space-between;
@@ -77,323 +77,391 @@
             font-size: 1.8rem;
         }
 */
-        .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-}
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
 
-.header h1 {
-    font-size: 2rem;
-    color: var(--text-color);
-}
+    .header h1 {
+      font-size: 2rem;
+      color: var(--text-color);
+    }
 
-        .date-time {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    font-size: 0.9rem;
-    color: #7f8c8d;
-}
+    .date-time {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      font-size: 0.9rem;
+      color: #7f8c8d;
+    }
 
-        /* Contenedor de ventas - diseño responsive */
-        .sales-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
+    /* Contenedor de ventas - diseño responsive */
+    .sales-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
 
-        @media (min-width: 1200px) {
-            .sales-container {
-                grid-template-columns: 2fr 1fr;
-            }
-        }
+    @media (min-width: 1200px) {
+      .sales-container {
+        grid-template-columns: 2fr 1fr;
+      }
+    }
 
-        /* Sección de productos */
-        .products-section {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
+    /* Sección de productos */
+    .products-section {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
 
-        /* Barra de búsqueda */
-        .search-bar {
-            display: flex;
-            margin-bottom: 20px;
-        }
+    /* Barra de búsqueda */
+    .search-bar {
+      display: flex;
+      margin-bottom: 20px;
+    }
 
-        .search-bar input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px 0 0 4px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
+    .search-bar input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px 0 0 4px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
 
-        .search-bar input:focus {
-            border-color: var(--accent-color);
-            outline: none;
-        }
+    .search-bar input:focus {
+      border-color: var(--accent-color);
+      outline: none;
+    }
 
-        .search-bar button {
-            background-color: var(--accent-color);
-            color: var(--dark-color);
-            border: none;
-            padding: 0 15px;
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+    .search-bar button {
+      background-color: var(--accent-color);
+      color: var(--dark-color);
+      border: none;
+      padding: 0 15px;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
 
-        .search-bar button:hover {
-            background-color: #00e076;
-        }
+    .search-bar button:hover {
+      background-color: #00e076;
+    }
 
-        /* Filtros de categoría */
-        .category-filter {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+    /* Filtros de categoría */
+    .category-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
 
-        .category-btn {
-            padding: 8px 15px;
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s;
-        }
+    .category-btn {
+      padding: 8px 15px;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+    }
 
-        .category-btn:hover {
-            background-color: #f8f9fa;
-        }
+    .category-btn:hover {
+      background-color: #f8f9fa;
+    }
 
-        .category-btn.active {
-            background-color: var(--accent-color);
-            color: var(--dark-color);
-            border-color: var(--accent-color);
-        }
+    .category-btn.active {
+      background-color: var(--accent-color);
+      color: var(--dark-color);
+      border-color: var(--accent-color);
+    }
 
-        /* Grid de productos */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-        }
+    /* Grid de productos */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+    }
 
-        .product-card {
-            background-color: white;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
+    .product-card {
+      background-color: white;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
 
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
 
-       
 
-        .product-card h4 {
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-            color: var(--dark-color);
-        }
 
-        .product-card .price {
-            font-weight: 600;
-            color: var(--primary-color);
-        }
+    .product-card h4 {
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+      color: var(--dark-color);
+    }
 
-        /* Contenedor del carrito */
-        .cart-container {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+    .product-card .price {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
 
-        .cart-container h3 {
-            color: var(--dark-color);
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-        }
+    /* Contenedor del carrito */
+    .cart-container {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
 
-        /* Items del carrito */
-        .cart-items {
-            flex: 1;
-            min-height: 200px;
-            border: 1px dashed #ddd;
-            border-radius: 4px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
+    .cart-container h3 {
+      color: var(--dark-color);
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
 
-        .empty-cart-message {
-            color: #95a5a6;
-            text-align: center;
-            padding: 20px 0;
-        }
+    /* Items del carrito */
+    .cart-items {
+      flex: 1;
+      min-height: 200px;
+      border: 1px dashed #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
 
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
+    .empty-cart-message {
+      color: #95a5a6;
+      text-align: center;
+      padding: 20px 0;
+    }
 
-        .cart-item:last-child {
-            border-bottom: none;
-        }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
 
-        .cart-item-info {
-            flex: 1;
-        }
+    .cart-item:last-child {
+      border-bottom: none;
+    }
 
-        .cart-item-name {
-            font-weight: 500;
-            margin-bottom: 3px;
-        }
+    .cart-item-info {
+      flex: 1;
+    }
 
-        .cart-item-price {
-            font-size: 0.9rem;
-            color: #7f8c8d;
-        }
+    .cart-item-name {
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
 
-        .cart-item-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .cart-item-price {
+      font-size: 0.9rem;
+      color: #7f8c8d;
+    }
 
-        .cart-item-quantity {
-            width: 40px;
-            text-align: center;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
+    .cart-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .remove-item {
-            color: var(--danger-color);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-        }
+    .cart-item-quantity {
+      width: 40px;
+      text-align: center;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
 
-        /* Totales del carrito */
-        .cart-totals {
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
+    .remove-item {
+      color: var(--danger-color);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
 
-        .cart-total-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
+    /* Totales del carrito */
+    .cart-totals {
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+    }
 
-        .cart-total-row.total {
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--dark-color);
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
-        }
+    .cart-total-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
 
-        /* Métodos de pago */
-        .payment-methods {
-            margin-top: 15px;
-        }
+    .cart-total-row.total {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--dark-color);
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+    }
 
-        .payment-methods h4 {
-            margin-bottom: 10px;
-            font-size: 1rem;
-        }
+    /* Métodos de pago */
+    .payment-methods {
+      margin-top: 15px;
+    }
 
-        .payment-methods label {
-            display: block;
-            margin-bottom: 8px;
-            cursor: pointer;
-        }
+    .payment-methods h4 {
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
 
-        /* Botón de finalizar venta */
-        .checkout-btn {
-            background-color: var(--accent-color);
-            color: var(--dark-color);
-            border: none;
-            padding: 15px;
-            border-radius: 4px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 20px;
-            width: 100%;
-        }
+    .payment-methods label {
+      display: block;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
 
-        .checkout-btn:hover {
-            background-color: #00e076;
-        }
+    /* Botón de finalizar venta */
+    .checkout-btn {
+      background-color: var(--accent-color);
+      color: var(--dark-color);
+      border: none;
+      padding: 15px;
+      border-radius: 4px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 20px;
+      width: 100%;
+    }
 
-        /* Botón de invitado */
-        .guest-btn {
-            position: fixed;
-            left: 20px;
-            bottom: 20px;
-            background-color: var(--accent-color);
-            color: var(--dark-color);
-            padding: 10px 15px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background-color 0.3s;
-        }
+    .checkout-btn:hover {
+      background-color: #00e076;
+    }
 
-        .guest-btn:hover {
-            background-color: #00e076;
-        }
+    /* Botón de invitado */
+    .guest-btn {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      background-color: var(--accent-color);
+      color: var(--dark-color);
+      padding: 10px 15px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.3s;
+    }
 
-        /* Mensajes de error */
-        .error-message {
-            color: var(--danger-color);
-            margin-top: 15px;
-            font-size: 0.9rem;
-            display: none;
-        }
+    .guest-btn:hover {
+      background-color: #00e076;
+    }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .date-time {
-                margin-top: 5px;
-            }
-            
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            }
-        }
-    </style>
+    /* Mensajes de error */
+    .error-message {
+      color: var(--danger-color);
+      margin-top: 15px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .date-time {
+        margin-top: 5px;
+      }
+
+      .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      }
+    }
+
+    #emailModal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+    }
+
+
+    #emailModal .modal-content {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.25);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+    }
+
+    #emailModal input {
+      width: 100%;
+      padding: 10px;
+      margin: 12px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    #emailModal .modal-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #emailModal button {
+      padding: 10px 20px;
+      font-weight: bold;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #emailModal button[type="submit"] {
+      background-color: #2ecc71;
+      color: white;
+    }
+
+    #emailModal button[type="button"] {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    #emailModal .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: red;
+    }
+  </style>
 </head>
 
 <body>
@@ -434,7 +502,7 @@
             <!-- Ejemplo de productos (se cargarían dinámicamente) -->
             <div class="product-card">
 
-                <h4>Coca-Cola 600ml</h4>
+              <h4>Coca-Cola 600ml</h4>
               <div class="price">$18.00</div>
             </div>
 
@@ -448,17 +516,17 @@
               <div class="price">$25.00</div>
             </div>
             <div class="product-card">
-           
+
               <h4>Pan Bimbo</h4>
               <div class="price">$32.00</div>
             </div>
             <div class="product-card">
-           
+
               <h4>Huevo 18pz</h4>
               <div class="price">$45.00</div>
             </div>
             <div class="product-card">
-          
+
               <h4>Galletas Oreo</h4>
               <div class="price">$22.00</div>
             </div>
@@ -470,19 +538,7 @@
           <h3>Estás comprando:</h3>
           <div class="cart-items" id="cartItems">
             <p class="empty-cart-message">La canasta está vacía</p>
-            <!-- Ejemplo de items en el carrito (se cargarían dinámicamente) -->
-            <!--
-            <div class="cart-item">
-              <div class="cart-item-info">
-                <div class="cart-item-name">Coca-Cola 600ml</div>
-                <div class="cart-item-price">$18.00 c/u</div>
-              </div>
-              <div class="cart-item-actions">
-                <input type="number" class="cart-item-quantity" value="1" min="1">
-                <button class="remove-item"><i class="fas fa-trash"></i></button>
-              </div>
-            </div>
-            -->
+
           </div>
 
           <div class="cart-totals">
@@ -511,39 +567,80 @@
       </div>
     </main>
   </div>
+  <!-- Modal de correo para pago con tarjeta 
+<div id="emailModal" class="modal-overlay">
+  <div class="modal-content">
+    <span class="close-btn" onclick="cerrarModal()">×</span>
+    <h3>Ingresa tus datos para recibir el ticket</h3>
+    <form id="emailForm">
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" required>
+      
+      <label for="correo">Correo electrónico:</label>
+      <input type="email" id="correo" required>
+
+      <button type="submit">Enviar Ticket</button>
+    </form>
+  </div>
+</div>-->
+
 
   <!-- Botón de invitado -->
   <a href="#" class="guest-btn" id="guestBtn">Modo Invitado</a>
 
-  <!-- Scripts -->
-  <script src="js/auth.js"></script>
-  <script src="js/ventas.js"></script>
+
   <script>
     // Función para mostrar fecha y hora actual
     function updateDateTime() {
-  const now = new Date();
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  const dateEl = document.getElementById('current-date');
-  const timeEl = document.getElementById('current-time');
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateEl = document.getElementById('current-date');
+      const timeEl = document.getElementById('current-time');
 
-  if (dateEl) dateEl.textContent = now.toLocaleDateString('es-MX', options);
-  if (timeEl) timeEl.textContent = now.toLocaleTimeString('es-MX');
-}
-setInterval(updateDateTime, 1000);
-updateDateTime();
+      if (dateEl) dateEl.textContent = now.toLocaleDateString('es-MX', options);
+      if (timeEl) timeEl.textContent = now.toLocaleTimeString('es-MX');
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
 
-    
+
     // Actualizar cada segundo
     setInterval(updateDateTime, 1000);
     updateDateTime(); // Llamar inmediatamente
-    
+
     // Ejemplo de funcionalidad para el botón de invitado
-    document.getElementById('guestBtn').addEventListener('click', function(e) {
+    document.getElementById('guestBtn').addEventListener('click', function (e) {
       e.preventDefault();
       const guestBanner = document.getElementById('guestBanner');
       guestBanner.style.display = guestBanner.style.display === 'none' ? 'block' : 'none';
     });
   </script>
+
+  <!-- Modal -->
+  <div id="emailModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close-btn" onclick="cerrarModal()">×</span>
+      <h2>Ingresa tus datos para recibir el ticket</h2>
+
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" placeholder="Tu nombre" required />
+
+      <label for="correo">Correo electrónico:</label>
+      <input type="email" id="correo" placeholder="ejemplo@correo.com" required />
+
+      <div class="modal-buttons">
+        <button type="submit" id="enviarBtn">Enviar</button>
+        <button type="button" id="cancelarBtn">Cancelar</button>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Scripts -->
+  <script src="js/auth.js"></script>
+  <script src="js/ventas.js"></script>
+
 </body>
 
 </html>
