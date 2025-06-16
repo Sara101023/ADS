@@ -37,8 +37,15 @@
     </div>
 
     <script>
-        const rol = localStorage.getItem('rol');
-        if (rol !== 'cashier') window.location.href = 'login.html';
+        
+    const rol = localStorage.getItem('rol');
+console.log('Rol actual:', rol);
+
+if (rol !== 'admin' && window.location.pathname.includes('index.html')) {
+    window.location.href = 'login.html';
+} else if (rol !== 'cashier' && window.location.pathname.includes('cajero.html')) {
+    window.location.href = 'login.html';
+}
 
         document.getElementById('logout-btn').addEventListener('click', () => {
             localStorage.clear();

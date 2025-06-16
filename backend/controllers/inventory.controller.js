@@ -1,197 +1,226 @@
-const Product = require('../models/Product');
+const Product = require('../models/product.model');
+
+// Constantes para mensajes y configuraciones
+const ERROR_MESSAGES = {
+    SERVER_ERROR: 'Error en el servidor',
+    NOT_FOUND: 'Producto no encontrado',
+    UNAUTHORIZED: 'No autorizado',
+    INVALID_DATA: 'Datos inválidos',
+    BARCODE_EXISTS: 'El código de barras ya está en uso'
+};
+
+const DEFAULT_VALUES = {
+    UNIT: 'pieza',
+    MIN_STOCK: 5,
+    HAS_IVA: true
+};
 
 const inventoryController = {
+    /**
+     * Obtiene todos los productos
+     */
     getAllProducts: async (req, res) => {
         try {
             const products = await Product.getAll();
             res.json(products);
         } catch (error) {
-            console.error('Error al obtener productos:', error);
-            res.status(500).json({ error: 'Error en el servidor' });
+            handleServerError(res, 'Error al obtener productos:', error);
         }
     },
 
+    /**
+     * Obtiene un producto por ID
+     */
     getProductById: async (req, res) => {
         try {
-            const { id } = req.params;
-            const product = await Product.getById(id);
-            
-            if (!product) {
-                return res.status(404).json({ error: 'Producto no encontrado' });
-            }
-            
-            res.json(product);
+            const product = await getProductOrFail(req.params.id, res);
+            if (product) res.json(product);
         } catch (error) {
-            console.error('Error al obtener producto:', error);
-            res.status(500).json({ error: 'Error en el servidor' });
+            handleServerError(res, 'Error al obtener producto:', error);
         }
     },
 
+    /**
+     * Obtiene un producto por código de barras
+     */
     getProductByBarcode: async (req, res) => {
         try {
             const { barcode } = req.params;
             const product = await Product.getByBarcode(barcode);
             
             if (!product) {
-                return res.status(404).json({ error: 'Producto no encontrado' });
+                return res.status(404).json({ error: ERROR_MESSAGES.NOT_FOUND });
             }
             
             res.json(product);
         } catch (error) {
-            console.error('Error al obtener producto por código de barras:', error);
-            res.status(500).json({ error: 'Error en el servidor' });
+            handleServerError(res, 'Error al obtener producto por código de barras:', error);
         }
     },
 
+    /**
+     * Crea un nuevo producto (solo administrador)
+     */
     createProduct: async (req, res) => {
-        if (req.user.role !== 'administrador') {
-            return res.status(403).json({ error: 'No autorizado' });
+        if (!isAdmin(req.user)) {
+            return res.status(403).json({ error: ERROR_MESSAGES.UNAUTHORIZED });
         }
         
         try {
-            const {
-                nombre,
-                categoria = null,
-                precio,
-                stock,
-                codigo_barras,
-                unidad_medida = 'pieza',
-                stock_minimo = 5,
-                tiene_iva = true,
-                proveedor_id = null
-            } = req.body;
+            const { nombre, descripcion, precio, stock, codigo_barras, id_proveedor } = req.body;
             
-            // Validar campos obligatorios
-            if (!nombre || !precio || !stock || !codigo_barras) {
-                return res.status(400).json({ error: 'Nombre, precio, stock y código de barras son requeridos' });
-            }
+            // Validación de campos
+            const validationError = validateProductFields({ nombre, precio, stock, codigo_barras });
+            if (validationError) return res.status(400).json({ error: validationError });
             
-            // Validar que el precio y stock sean números positivos
-            if (isNaN(precio) || precio <= 0 || isNaN(stock) || stock < 0) {
-                return res.status(400).json({ error: 'Precio y stock deben ser números válidos' });
-            }
-            
-            // Verificar si el código de barras ya existe
-            const existingProduct = await Product.getByBarcode(codigo_barras);
-            if (existingProduct) {
-                return res.status(400).json({ error: 'El código de barras ya está en uso' });
+            // Verificar código de barras único
+            if (await Product.getByBarcode(codigo_barras)) {
+                return res.status(400).json({ error: ERROR_MESSAGES.BARCODE_EXISTS });
             }
             
             // Crear producto
             const productId = await Product.create({
                 nombre,
-                categoria,
+                descripcion: descripcion || null,
                 precio,
                 stock,
                 codigo_barras,
-                unidad_medida,
-                stock_minimo,
-                tiene_iva,
-                proveedor_id
+                id_proveedor: id_proveedor || null,
+                estado: 'activo',
+                fecha_desactivacion: null
             });
             
-            res.status(201).json({ id: productId, message: 'Producto creado exitosamente' });
+            res.status(201).json({ 
+                id: productId, 
+                message: 'Producto creado exitosamente' 
+            });
         } catch (error) {
-            console.error('Error al crear producto:', error);
-            res.status(500).json({ error: 'Error en el servidor' });
+            handleServerError(res, 'Error al crear producto:', error);
         }
     },
 
+    /**
+     * Actualiza un producto existente (solo administrador)
+     */
     updateProduct: async (req, res) => {
-        if (req.user.role !== 'administrador') {
-            return res.status(403).json({ error: 'No autorizado' });
+        if (!isAdmin(req.user)) {
+            return res.status(403).json({ error: ERROR_MESSAGES.UNAUTHORIZED });
         }
         
         try {
             const { id } = req.params;
-            const {
-                nombre,
-                categoria,
-                precio,
-                stock,
-                codigo_barras,
-                unidad_medida,
-                stock_minimo,
-                tiene_iva,
-                proveedor_id
-            } = req.body;
+            const existingProduct = await getProductOrFail(id, res);
+            if (!existingProduct) return;
             
-            // Validar que el producto existe
-            const existingProduct = await Product.getById(id);
-            if (!existingProduct) {
-                return res.status(404).json({ error: 'Producto no encontrado' });
-            }
+            // Validar campos actualizados
+            const { precio, stock, codigo_barras } = req.body;
+            const validationError = validateUpdatedFields({ precio, stock });
+            if (validationError) return res.status(400).json({ error: validationError });
             
-            // Validar que el precio y stock sean números positivos si se proporcionan
-            if (precio && (isNaN(precio) || precio <= 0)) {
-                return res.status(400).json({ error: 'Precio debe ser un número válido' });
-            }
-            
-            if (stock && (isNaN(stock) || stock < 0)) {
-                return res.status(400).json({ error: 'Stock debe ser un número válido' });
-            }
-            
-            // Verificar si el nuevo código de barras ya existe (si se está cambiando)
+            // Verificar código de barras único si se cambia
             if (codigo_barras && codigo_barras !== existingProduct.codigo_barras) {
-                const productWithBarcode = await Product.getByBarcode(codigo_barras);
-                if (productWithBarcode) {
-                    return res.status(400).json({ error: 'El código de barras ya está en uso' });
+                if (await Product.getByBarcode(codigo_barras)) {
+                    return res.status(400).json({ error: ERROR_MESSAGES.BARCODE_EXISTS });
                 }
             }
             
+            // Preparar datos para actualización
+            const updateData = prepareUpdateData(req.body, existingProduct);
+            
             // Actualizar producto
-            await Product.update(id, {
-                nombre: nombre || existingProduct.nombre,
-                categoria: categoria || existingProduct.categoria,
-                precio: precio || existingProduct.precio,
-                stock: stock || existingProduct.stock,
-                codigo_barras: codigo_barras || existingProduct.codigo_barras,
-                unidad_medida: unidad_medida || existingProduct.unidad_medida,
-                stock_minimo: stock_minimo || existingProduct.stock_minimo,
-                tiene_iva: tiene_iva !== undefined ? tiene_iva : existingProduct.tiene_iva,
-                proveedor_id: proveedor_id || existingProduct.proveedor_id
-            });
+            await Product.update(id, updateData);
             
             res.json({ message: 'Producto actualizado exitosamente' });
         } catch (error) {
-            console.error('Error al actualizar producto:', error);
-            res.status(500).json({ error: 'Error en el servidor' });
+            handleServerError(res, 'Error al actualizar producto:', error);
         }
     },
 
+    /**
+     * Desactiva un producto (solo administrador)
+     */
     deactivateProduct: async (req, res) => {
-        if (req.user.role !== 'administrador') {
-            return res.status(403).json({ error: 'No autorizado' });
+        if (!isAdmin(req.user)) {
+            return res.status(403).json({ error: ERROR_MESSAGES.UNAUTHORIZED });
         }
         
         try {
             const { id } = req.params;
+            const product = await getProductOrFail(id, res);
+            if (!product) return;
             
-            // Verificar que el producto existe
-            const product = await Product.getById(id);
-            if (!product) {
-                return res.status(404).json({ error: 'Producto no encontrado' });
-            }
-            
-            // Desactivar producto
-            await Product.deactivate(id);
+            await Product.update(id, {
+                estado: 'inactivo',
+                fecha_desactivacion: new Date()
+            });
             
             res.json({ message: 'Producto desactivado exitosamente' });
         } catch (error) {
-            console.error('Error al desactivar producto:', error);
-            res.status(500).json({ error: 'Error en el servidor' });
+            handleServerError(res, 'Error al desactivar producto:', error);
         }
     },
 
+    /**
+     * Obtiene productos con bajo stock
+     */
     checkLowStock: async (req, res) => {
         try {
-            const lowStockProducts = await Product.checkLowStock();
+            const lowStockProducts = await Product.getLowStock();
             res.json(lowStockProducts);
         } catch (error) {
-            console.error('Error al verificar stock bajo:', error);
-            res.status(500).json({ error: 'Error en el servidor' });
+            handleServerError(res, 'Error al verificar stock bajo:', error);
         }
     }
 };
+
+// Funciones auxiliares
+function isAdmin(user) {
+    return user.id_rol === 1; // 1 = administrador en tu base de datos
+}
+
+async function getProductOrFail(id, res) {
+    const product = await Product.getById(id);
+    if (!product) {
+        res.status(404).json({ error: ERROR_MESSAGES.NOT_FOUND });
+        return null;
+    }
+    return product;
+}
+
+function validateProductFields({ nombre, precio, stock, codigo_barras }) {
+    if (!nombre || !precio || !stock || !codigo_barras) {
+        return 'Nombre, precio, stock y código de barras son requeridos';
+    }
+    if (isNaN(precio) || precio <= 0 || isNaN(stock) || stock < 0) {
+        return 'Precio y stock deben ser números válidos';
+    }
+    return null;
+}
+
+function validateUpdatedFields({ precio, stock }) {
+    if (precio && (isNaN(precio) || precio <= 0)) {
+        return 'Precio debe ser un número válido';
+    }
+    if (stock && (isNaN(stock) || stock < 0)) {
+        return 'Stock debe ser un número válido';
+    }
+    return null;
+}
+
+function prepareUpdateData(newData, existingProduct) {
+    return {
+        nombre: newData.nombre || existingProduct.nombre,
+        descripcion: newData.descripcion || existingProduct.descripcion,
+        precio: newData.precio || existingProduct.precio,
+        stock: newData.stock || existingProduct.stock,
+        codigo_barras: newData.codigo_barras || existingProduct.codigo_barras,
+        id_proveedor: newData.id_proveedor || existingProduct.id_proveedor
+    };
+}
+
+function handleServerError(res, logMessage, error) {
+    console.error(logMessage, error);
+    res.status(500).json({ error: ERROR_MESSAGES.SERVER_ERROR });
+}
 
 module.exports = inventoryController;

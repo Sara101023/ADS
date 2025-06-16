@@ -1,8 +1,8 @@
-const pool = require('../config/db');
+const pool = require('../config/database');
 
 class Sale {
     static async create(saleData) {
-        const { fecha, total, subtotal, iva, metodo_pago, usuario_id } = saleData;
+        const { fecha, total, id_metodo_pago, id_usuario } = saleData;
         const conn = await pool.getConnection();
         
         try {
@@ -10,21 +10,21 @@ class Sale {
             
             // Insertar la venta
             const [saleResult] = await conn.query(
-                'INSERT INTO ventas (fecha, total, subtotal, iva, metodo_pago, usuario_id) VALUES (?, ?, ?, ?, ?, ?)',
-                [fecha, total, subtotal, iva, metodo_pago, usuario_id]
+                'INSERT INTO venta (fecha, total, id_metodo_pago, id_usuario) VALUES (?, ?, ?, ?)',
+                [fecha, total, id_metodo_pago, id_usuario]
             );
             const saleId = saleResult.insertId;
             
             // Insertar detalles de la venta y actualizar stock
             for (const item of saleData.items) {
                 await conn.query(
-                    'INSERT INTO detalle_venta (venta_id, producto_id, cantidad, precio_unitario, descuento) VALUES (?, ?, ?, ?, ?)',
-                    [saleId, item.producto_id, item.cantidad, item.precio_unitario, item.descuento || 0]
+                    'INSERT INTO venta (id_venta, id_producto, cantidad) VALUES (?, ?, ?)',
+                    [saleId, item.id_producto, item.cantidad || 0]
                 );
                 
                 await conn.query(
-                    'UPDATE productos SET stock = stock - ? WHERE id = ?',
-                    [item.cantidad, item.producto_id]
+                    'UPDATE producto SET stock = stock - ? WHERE id_producto = ?',
+                    [item.cantidad, item.id_producto]
                 );
             }
             
@@ -39,11 +39,11 @@ class Sale {
     }
 
     static async getById(id) {
-        const [saleRows] = await pool.query('SELECT * FROM ventas WHERE id = ?', [id]);
+        const [saleRows] = await pool.query('SELECT * FROM venta WHERE id_venta = ?', [id]);
         if (saleRows.length === 0) return null;
         
         const [detailRows] = await pool.query(
-            'SELECT dv.*, p.nombre as producto_nombre FROM detalle_venta dv JOIN productos p ON dv.producto_id = p.id WHERE dv.venta_id = ?',
+            'SELECT dv.*, p.nombre as producto_nombre FROM venta dv JOIN productos p ON dv.producto_id = p.id WHERE dv.venta_id = ?',
             [id]
         );
         

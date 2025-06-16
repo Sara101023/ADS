@@ -6,13 +6,14 @@
     <title>Punto de Venta - Inventario</title>
     <link rel="stylesheet" href="css/estilos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <style>
+         /* Estructura principal */
         .inventory-container {
             display: flex;
             flex-direction: column;
         }
         
+        /* Encabezado */
         .inventory-header {
             display: flex;
             justify-content: space-between;
@@ -20,6 +21,7 @@
             margin-bottom: 20px;
         }
         
+        /* Botones */
         .inventory-actions {
             display: flex;
             gap: 10px;
@@ -50,9 +52,9 @@
         
         .btn-danger:hover {
             background-color: #c0392b;
-           
         }
         
+        /* Tabla */
         .inventory-table {
             width: 100%;
             border-collapse: collapse;
@@ -79,6 +81,7 @@
             background-color: #f9f9f9;
         }
         
+        /* Estados */
         .low-stock {
             color: var(--danger-color);
             font-weight: 500;
@@ -92,6 +95,7 @@
             color: var(--danger-color);
         }
         
+        /* Botones de acción */
         .action-btns {
             display: flex;
             gap: 5px;
@@ -115,7 +119,7 @@
             color: white;
         }
         
-        /* Modal de agregar/editar producto */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -159,6 +163,7 @@
             color: #7f8c8d;
         }
         
+        /* Formulario */
         .form-group {
             margin-bottom: 15px;
         }
@@ -205,17 +210,18 @@
             width: auto;
             margin-right: 10px;
         }
+
     </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <aside class="sidebar">
+           <aside class="sidebar">
             <div class="logo">
                 <img src="css/logo.png" alt="Logo Tienda">
                 <h2>Mi Tienda</h2>
             </div>
             <nav class="menu">
-               <ul>
+                <ul>
                     <li><a href="index.html"><i class="icon fas fa-chart-line"></i>General</a></li>
                     <li class="active"><a href="inventario.html"><i class="icon fas fa-boxes"></i>Inventario</a></li>
                     <li><a href="reportes.html"><i class="icon fas fa-chart-pie"></i>Reportes</a></li>
@@ -251,9 +257,9 @@
                 <table class="inventory-table">
                     <thead>
                         <tr>
-                            <th>Código</th>
+                            <th>Código Barras</th>
                             <th>Nombre</th>
-                            <th>Categoría</th>
+                            <th>Descripción</th>
                             <th>Precio</th>
                             <th>Stock</th>
                             <th>Proveedor</th>
@@ -274,88 +280,19 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="modalTitle">Agregar Producto</h3>
-                <button class="close-btn">&times;</button>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
             </div>
             <form id="productForm">
                 <input type="hidden" id="productId">
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="productCode">Código de Barras/SKU</label>
-                        <input type="text" id="productCode" required>
+                        <label for="productBarcode">Código de Barras</label>
+                        <input type="text" id="productBarcode" required>
                     </div>
                     <div class="form-group">
                         <label for="productName">Nombre</label>
                         <input type="text" id="productName" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="productCategory">Categoría</label>
-                        <select id="productCategory" required>
-                            <option value="">Seleccione una categoría</option>
-                            <option value="Bebidas">Bebidas</option>
-                            <option value="Botanas">Botanas</option>
-                            <option value="Lácteos">Lácteos</option>
-                            <option value="Panadería">Panadería</option>
-                            <option value="Abarrotes">Abarrotes</option>
-                            <option value="Limpieza">Limpieza</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="productSupplier">Proveedor</label>
-                        <select id="productSupplier" required>
-                            <option value="">Seleccione un proveedor</option>
-                            <option value="Coca-Cola">Coca-Cola</option>
-                            <option value="Sabritas">Sabritas</option>
-                            <option value="Lala">Lala</option>
-                            <option value="Bimbo">Bimbo</option>
-                            <option value="Soriana">McCormick</option>
-                            <option value="Otro">Otro</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="productPrice">Precio</label>
-                        <input type="number" id="productPrice" min="0" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="productCost">Costo</label>
-                        <input type="number" id="productCost" min="0" step="0.01" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="productStock">Stock Actual</label>
-                        <input type="number" id="productStock" min="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="productMinStock">Stock Mínimo</label>
-                        <input type="number" id="productMinStock" min="0" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="productUnit">Unidad de Medida</label>
-                        <select id="productUnit" required>
-                            <option value="Pieza">Pieza</option>
-                            <option value="Kilogramo">Kilogramo</option>
-                            <option value="Kilogramo">Mililitros</option>
-                            <option value="Litro">Litro</option>
-                            <option value="Paquete">Paquete</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="productStatus">Estado</label>
-                        <select id="productStatus" required>
-                            <option value="active">Activo</option>
-                            <option value="inactive">Inactivo</option>
-                        </select>
                     </div>
                 </div>
                 
@@ -364,12 +301,37 @@
                     <textarea id="productDescription" rows="3"></textarea>
                 </div>
                 
-                <div class="form-group checkbox-group">
-                    <input type="checkbox" id="productHasIVA">
-                    <label for="productHasIVA">Aplicar IVA (16%)</label>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productPrice">Precio</label>
+                        <input type="number" id="productPrice" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productStock">Stock Actual</label>
+                        <input type="number" id="productStock" min="0" required>
+                    </div>
                 </div>
                 
-                           
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productSupplier">Proveedor</label>
+                        <select id="productSupplier">
+                            <option value="">Seleccione un proveedor</option>
+                            <option value="1">Distribuidora Abarrotes</option>
+                            <option value="2">Alimentos del Norte</option>
+                            <option value="3">Productos Selectos</option>
+                            <!-- Add more options based on your proveedor table -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productStatus">Estado</label>
+                        <select id="productStatus" required>
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                
                 <div class="form-actions">
                     <button type="button" class="btn btn-danger" id="cancelProductBtn">Cancelar</button>
                     <button type="submit" class="btn btn-primary" id="saveProductBtn">Guardar</button>

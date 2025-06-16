@@ -1,12 +1,12 @@
-const pool = require('../config/db');
+const pool = require('../config/database');
 
 class Return {
     static async getById(id) {
         const [rows] = await pool.query(
-            `SELECT d.*, dv.producto_id, dv.cantidad, p.nombre as producto_nombre 
-             FROM devoluciones d
-             JOIN detalle_devolucion dv ON d.id = dv.devolucion_id
-             JOIN productos p ON dv.producto_id = p.id
+            `SELECT d.*, dv.id_producto, dv.stock, p.nombre as producto_nombre 
+             FROM devolucion d
+             JOIN motivo dv ON d.id = dv.id.devolucion
+             JOIN producto p ON dv.id_producto = p.id
              WHERE d.id = ?`,
             [id]
         );
@@ -31,8 +31,8 @@ class Return {
     static async getAll() {
         const [rows] = await pool.query(
             `SELECT d.*, COUNT(dv.id) as items_count 
-             FROM devoluciones d
-             LEFT JOIN detalle_devolucion dv ON d.id = dv.devolucion_id
+             FROM devolucion d
+             LEFT JOIN motivo dv ON d.id = dv.id_devolucion
              GROUP BY d.id
              ORDER BY d.fecha DESC`
         );
@@ -42,11 +42,11 @@ class Return {
     static async getByDateRange(startDate, endDate) {
         const [rows] = await pool.query(
             `SELECT d.*, COUNT(dv.id) as items_count 
-             FROM devoluciones d
-             LEFT JOIN detalle_devolucion dv ON d.id = dv.devolucion_id
-             WHERE d.fecha BETWEEN ? AND ?
+             FROM devolucion d
+             LEFT JOIN motivo dv ON d.id = dv.id_devolucion
+             WHERE d.fecha_devolucion BETWEEN ? AND ?
              GROUP BY d.id
-             ORDER BY d.fecha DESC`,
+             ORDER BY d.fecha:devolucion DESC`,
             [startDate, endDate]
         );
         return rows;

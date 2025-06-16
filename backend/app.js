@@ -16,6 +16,7 @@ app.use(express.static(path.join(__dirname, '../front')));
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/usuarios', require('./routes/user.routes'));
 
+
 // Ruta fallback para aplicaciones SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../front/index.html'));

@@ -95,17 +95,15 @@
     <script src="js/auth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-    const rol = localStorage.getItem('rol');
-    
-    // Por ejemplo, en index.html (solo admin puede entrar)
-    if (rol !== 'admin') {
-        window.location.href = 'login.html';
-    }
 
-    // En cajero.html (solo cajero)
-    if (rol !== 'cashier') {
-        window.location.href = 'login.html';
-    }
+const rol = localStorage.getItem('rol');
+console.log('Rol actual:', rol);
+
+if (rol !== 'admin' && window.location.pathname.includes('index.html')) {
+    window.location.href = 'login.html';
+} else if (rol !== 'cashier' && window.location.pathname.includes('cajero.html')) {
+    window.location.href = 'login.html';
+}
 </script>
 
 </body>

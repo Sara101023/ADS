@@ -1,269 +1,263 @@
 <!DOCTYPE html>
 <html lang="es">
-
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Punto de Venta - Gestión de Usuarios</title>
     <link rel="stylesheet" href="css/estilos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <style>
-/* Estilos específicos para la gestión de usuarios */
-.user-management {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    padding: 20px;
-    margin-bottom: 20px;
-}
+        /* --- Estilos generales --- */
+        .users-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-/* Contenedor principal */
-.users-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
+        .user-management {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
 
-/* Filtros superiores */
-.user-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 20px;
-    align-items: center;
-}
+        /* --- Filtros y búsqueda --- */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
 
-.filter-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-.filter-group label {
-    font-weight: 500;
-    color: var(--secondary-color);
-    white-space: nowrap;
-}
+        .filter-group label {
+            font-weight: 500;
+            color: var(--secondary-color);
+            white-space: nowrap;
+        }
 
-.search-group {
-    flex: 1;
-    min-width: 250px;
-    display: flex;
-}
+        .search-group {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+        }
 
-.search-group input {
-    flex: 1;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
+        /* --- Tabla de usuarios --- */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
 
-.search-group button {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    padding: 8px 12px;
-}
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
 
-/* Tabla de usuarios */
-.users-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
+        .data-table th {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            font-weight: 600;
+            padding: 12px 15px;
+            text-align: left;
+        }
 
-.users-table th {
-    background-color: var(--light-color);
-    color: var(--dark-color);
-    font-weight: 600;
-    padding: 12px 15px;
-    text-align: left;
-}
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            color: var(--text-color);
+        }
 
-.users-table td {
-    padding: 12px 15px;
-    border-bottom: 1px solid #eee;
-    color: var(--text-color);
-}
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
 
-.users-table tr:last-child td {
-    border-bottom: none;
-}
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
 
-.users-table tr:hover {
-    background-color: #f8f9fa;
-}
+        /* --- Indicadores de estado --- */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
 
-/* Badges de estado */
-.status-badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
+        .status-badge.active {
+            background-color: #d4edda;
+            color: #155724;
+        }
 
-.status-badge.active {
-    background-color: #d4edda;
-    color: #155724;
-}
+        .status-badge.inactive {
+            background-color: #fff3cd;
+            color: #856404;
+        }
 
-.status-badge.inactive {
-    background-color: #fff3cd;
-    color: #856404;
-}
+        /* --- Botones de acción --- */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
 
-/* Botones de acción */
-.action-buttons {
-    display: flex;
-    gap: 8px;
-}
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6c757d;
+            font-size: 1rem;
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.btn-icon {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #6c757d;
-    font-size: 1rem;
-    padding: 5px;
-    border-radius: 4px;
-    transition: all 0.3s;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        .btn-icon:hover {
+            background-color: #f8f9fa;
+        }
 
-.btn-icon:hover {
-    background-color: #f8f9fa;
-}
+        .btn-edit {
+            color: var(--accent-color);
+        }
 
-.btn-edit {
-    color: var(--accent-color);
-}
+        .btn-delete {
+            color: var(--danger-color);
+        }
 
-.btn-edit:hover {
-    color: #2980b9;
-}
+        .btn-reset {
+            color: var(--warning-color);
+        }
 
-.btn-delete {
-    color: var(--danger-color);
-}
+        /* --- Modales --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
 
-.btn-delete:hover {
-    color: #c0392b;
-}
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
 
-.btn-reset {
-    color: var(--warning-color);
-}
+        .user-modal {
+            max-width: 600px;
+        }
 
-.btn-reset:hover {
-    color: #d68910;
-}
+        .small-modal {
+            max-width: 450px;
+        }
 
-/* Modal */
-.user-modal {
-    max-width: 600px;
-}
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-.small-modal {
-    max-width: 450px;
-}
+        .close-modal {
+            font-size: 24px;
+            cursor: pointer;
+        }
 
-.modal-body .form-row {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
-}
+        /* --- Formularios --- */
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
 
-.modal-body .form-row .form-group {
-    flex: 1;
-}
+        .form-group {
+            flex: 1;
+            margin-bottom: 15px;
+        }
 
-.password-input {
-    position: relative;
-}
+        .password-input {
+            position: relative;
+        }
 
-.password-input input {
-    padding-right: 35px;
-    width: 100%;
-}
+        .password-input input {
+            padding-right: 35px;
+            width: 100%;
+        }
 
-.password-input .btn-icon {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #6c757d;
-    cursor: pointer;
-}
+        .password-input .btn-icon {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
 
-/* Paginación */
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    padding: 15px;
-    border-top: 1px solid #eee;
-}
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
 
-.pagination button {
-    background: none;
-    border: 1px solid #ddd;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        /* --- Paginación --- */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
 
-.pagination button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .user-filters {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .filter-group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .search-group {
-        min-width: 100%;
-    }
-    
-    .action-buttons {
-        flex-direction: column;
-    }
-    
-    .users-table {
-        display: block;
-        overflow-x: auto;
-    }
-    
-    .modal-body .form-row {
-        flex-direction: column;
-        gap: 0;
-    }
-}
-</style>
-
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-group {
+                min-width: 100%;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo">
                 <img src="css/logo.png" alt="Logo Tienda">
@@ -274,7 +268,7 @@
                     <li><a href="index.html"><i class="icon fas fa-chart-line"></i>General</a></li>
                     <li><a href="inventario.html"><i class="icon fas fa-boxes"></i>Inventario</a></li>
                     <li><a href="reportes.html"><i class="icon fas fa-chart-pie"></i>Reportes</a></li>
-                    <li ><a href="promociones.html"><i class="icon fas fa-tag"></i>Promociones</a></li>
+                    <li><a href="promociones.html"><i class="icon fas fa-tag"></i>Promociones</a></li>
                     <li class="active"><a href="usuarios.html"><i class="icon fas fa-users"></i>Usuarios</a></li>
                 </ul>
             </nav>
@@ -285,6 +279,7 @@
             </div>
         </aside>
 
+        <!-- Contenido principal -->
         <main class="main-content">
             <header class="header">
                 <h1>Gestión de Usuarios</h1>
@@ -295,14 +290,14 @@
                 </div>
             </header>
 
+            <!-- Filtros -->
             <div class="filters">
                 <div class="filter-group">
                     <label for="role-filter">Rol:</label>
                     <select id="role-filter" class="form-control">
                         <option value="all">Todos</option>
-                        <option value="admin">Administrador</option>
+                        <option value="administrador">Administrador</option>
                         <option value="cashier">Cajero</option>
-                       
                     </select>
                 </div>
                 <div class="filter-group">
@@ -321,6 +316,7 @@
                 </div>
             </div>
 
+            <!-- Tabla de usuarios -->
             <div class="table-container">
                 <table class="data-table">
                     <thead>
@@ -335,7 +331,7 @@
                         </tr>
                     </thead>
                     <tbody id="users-table-body">
-                        <!-- Datos se cargarán dinámicamente desde JavaScript -->
+                        <!-- Datos se cargarán dinámicamente -->
                     </tbody>
                 </table>
                 <div class="pagination">
@@ -347,7 +343,7 @@
 
             <!-- Modal para agregar/editar usuario -->
             <div id="user-modal" class="modal">
-                <div class="modal-content">
+                <div class="modal-content user-modal">
                     <div class="modal-header">
                         <h3 id="modal-title">Nuevo Usuario</h3>
                         <span class="close-modal">&times;</span>
@@ -388,9 +384,8 @@
                                     <label for="role">Rol*</label>
                                     <select id="role" required>
                                         <option value="">Seleccionar...</option>
-                                        <option value="admin">Administrador</option>
+                                        <option value="administrador">Administrador</option>
                                         <option value="cashier">Cajero</option>
-                                        
                                     </select>
                                 </div>
                                 <div class="form-group">

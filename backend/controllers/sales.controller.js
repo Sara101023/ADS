@@ -1,6 +1,6 @@
-const Sale = require('../models/Sale');
-const Product = require('../models/Product');
-const Promotion = require('../models/Promotion');
+const Sale = require('../models/sale.model');
+const Product = require('../models/product.model');
+const Promotion = require('../models/promotion.model');
 
 const salesController = {
     processSale: async (req, res) => {

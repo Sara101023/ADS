@@ -1,4 +1,3 @@
-<!-- login.html corregido -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,6 +6,7 @@
     <title>Inicio de Sesión</title>
     <link rel="stylesheet" href="css/estilos.css" />
     <style>
+        /* --- Estilos generales --- */
         .login-container {
             display: flex;
             justify-content: center;
@@ -35,6 +35,7 @@
             margin-bottom: 20px;
         }
 
+        /* --- Estilos de formulario --- */
         .form-group {
             margin-bottom: 20px;
             text-align: left;
@@ -61,6 +62,7 @@
             outline: none;
         }
 
+        /* --- Botones --- */
         .login-btn {
             width: 100%;
             padding: 12px;
@@ -71,17 +73,11 @@
             font-size: 1rem;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-top: 10px;
         }
 
         .login-btn:hover {
-            background-color: #2980b9;
-        }
-
-        .error-message {
-            color: var(--danger-color);
-            margin-top: 15px;
-            font-size: 0.9rem;
-            display: none;
+            background-color: #00cc70;
         }
 
         .guest-btn {
@@ -98,13 +94,17 @@
             transition: background-color 0.3s;
             text-decoration: none;
         }
+
         .guest-btn:hover {
             background-color: #00cc70;
         }
+
+        /* --- Selector de roles --- */
         .role-selector {
             margin-top: 20px;
             text-align: center;
         }
+
         .role-selector h3 {
             margin-bottom: 15px;
             color: var(--secondary-color);
@@ -137,60 +137,50 @@
         }
 
         .admin-btn {
-            background-color: var(--admin-color);
-            color: white;
-        }
-
-        .admin-btn, .admin-btn.selected {
             background-color: #c0392b;
+            color: white;
         }
 
         .cashier-btn {
-            background-color: var(--cashier-color);
+            background-color: #27ae60;
             color: white;
         }
 
-        .cashier-btn, .cashier-btn.selected {
-            background-color: #27ae60;
+        .selected {
+            box-shadow: 0 0 0 2px var(--accent-color);
         }
 
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--accent-color);
-            color: rgb(0, 0, 0);
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 10px;
-        }
-
-        .login-btn:hover {
-            background-color: #00cc70;
+        /* --- Mensajes de error --- */
+        .error-message {
+            color: var(--danger-color);
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
         }
     </style>
-
 </head>
 <body>
     <div class="login-container">
         <div class="login-box">
             <img src="css/logo.png" alt="Logo Tienda" />
             <h2>Iniciar Sesión</h2>
+            
+            <!-- Selector de roles -->
             <div class="role-selector">
-        <h2>Selecciona tu rol</h2>
-        <div class="role-buttons">
-            <button class="role-btn admin-btn" onclick="selectRole('admin')">
-                <i class="fas fa-user-shield"></i>
-                Administrador
-            </button>
-            <button class="role-btn cashier-btn" onclick="selectRole('cashier')">
-                <i class="fas fa-cash-register"></i>
-                Cajero
-            </button>
-        </div>
+                <h2>Selecciona tu rol</h2>
+                <div class="role-buttons">
+                    <button class="role-btn admin-btn" onclick="selectRole('admin')">
+                        <i class="fas fa-user-shield"></i>
+                        Administrador
+                    </button>
+                    <button class="role-btn cashier-btn" onclick="selectRole('cashier')">
+                        <i class="fas fa-cash-register"></i>
+                        Cajero
+                    </button>
+                </div>
+            </div>
 
+            <!-- Formulario de login -->
             <form id="loginForm">
                 <div class="form-group">
                     <label for="numero_trabajador">Usuario</label>
@@ -211,56 +201,59 @@
 
     <script src="js/auth.js"></script>
     <script>
-        // Redirección para modo invitado
-        document.getElementById('guestBtn').addEventListener('click', function () {
+        // --- Variables ---
+        let rolSeleccionado = null;
+
+        // --- Funciones ---
+        function selectRole(rol) {
+            rolSeleccionado = rol;
+            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('selected'));
+            if (rol === 'admin') {
+                document.querySelector('.admin-btn').classList.add('selected');
+            } else if (rol === 'cashier') {
+                document.querySelector('.cashier-btn').classList.add('selected');
+            }
+        }
+
+        // --- Event Listeners ---
+        document.getElementById('guestBtn').addEventListener('click', function() {
             window.location.href = 'ventas.html?guest=true';
         });
-    </script>
-    
-    <script>
-    let rolSeleccionado = null;
 
-    function selectRole(rol) {
-        rolSeleccionado = rol;
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const usuario = document.getElementById('numero_trabajador').value;
+            const password = document.getElementById('password').value;
 
-        // Opcional: destacar botón seleccionado visualmente
-        document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('selected'));
-        if (rol === 'admin') {
-            document.querySelector('.admin-btn').classList.add('selected');
-        } else if (rol === 'cashier') {
-            document.querySelector('.cashier-btn').classList.add('selected');
-        }
-    }
+            try {
+                const response = await fetch('http://localhost:4000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuario, password }),
+                });
 
-    document.getElementById('guestBtn').addEventListener('click', function () {
-        window.location.href = 'ventas.html?guest=true';
-    });
+                if (!response.ok) throw new Error('Credenciales inválidas');
 
-    // Controlar envío del login
-    document.getElementById('loginForm').addEventListener('submit', function (e) {
-        e.preventDefault();
+                const data = await response.json();
+                const rol = data.rol;
 
-        const usuario = document.getElementById('numero_trabajador').value;
-        const password = document.getElementById('password').value;
+                if (!rol || (rol !== 'administrador' && rol !== 'cajero')) {
+                    throw new Error('Rol no válido');
+                }
 
-        // Aquí iría la validación real (puede ser con PHP, por ejemplo)
-        // Por ahora simulamos éxito si usuario = "admin" o "cajero"
-        if ((usuario === 'admin' && password === '1234' && rolSeleccionado === 'admin') ||
-            (usuario === 'cajero' && password === '1234' && rolSeleccionado === 'cashier')) {
+                localStorage.setItem('usuario', usuario);
+                localStorage.setItem('rol', rol);
 
-            localStorage.setItem('usuario', usuario);
-            localStorage.setItem('rol', rolSeleccionado);
-
-            if (rolSeleccionado === 'admin') {
-                window.location.href = 'index.html';
-            } else if (rolSeleccionado === 'cashier') {
-                window.location.href = 'cajero.html';
+                if (rol === 'administrador') {
+                    window.location.href = 'index.html';
+                } else if (rol === 'cajero') {
+                    window.location.href = 'cajero.html';
+                }
+            } catch (error) {
+                document.getElementById('errorMessage').style.display = 'block';
+                console.error('Error en inicio de sesión:', error);
             }
-        } else {
-            document.getElementById('errorMessage').style.display = 'block';
-        }
-    });
-</script>
-
+        });
+    </script>
 </body>
 </html>

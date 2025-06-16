@@ -9,6 +9,12 @@ const port = 4000;
 app.use(cors());
 app.use(express.json());
 
+const authRoutes = require('./routes/auth.routes');
+app.use('/api/ventas', require('./routes/sales.routes'));
+
+app.use('/api/auth', authRoutes);
+app.use('/api/inventory', require('./routes/inventory.routes'));
+
 // Middleware para logs
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
