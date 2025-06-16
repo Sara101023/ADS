@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const reportsController = require('../controllers/reportsController');
+const reportsController = require('../controllers/reports.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 
 // Rutas protegidas (solo admin)

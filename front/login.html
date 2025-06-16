@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+ 
+ <!DOCTYPE html> 
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
@@ -216,44 +217,53 @@
         }
 
         // --- Event Listeners ---
-        document.getElementById('guestBtn').addEventListener('click', function() {
-            window.location.href = 'ventas.html?guest=true';
-        });
 
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const usuario = document.getElementById('numero_trabajador').value;
-            const password = document.getElementById('password').value;
+    
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-            try {
-                const response = await fetch('http://localhost:4000/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ usuario, password }),
-                });
+        const numero_trabajador = document.getElementById('numero_trabajador').value.trim();
+        const contrasena = document.getElementById('password').value.trim();
+        const errorMsg = document.getElementById('errorMessage');
 
-                if (!response.ok) throw new Error('Credenciales inválidas');
+        try {
+            const response = await fetch('http://localhost:4000/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ numero_trabajador, contrasena })
+            });
 
-                const data = await response.json();
-                const rol = data.rol;
+            const data = await response.json();
 
-                if (!rol || (rol !== 'administrador' && rol !== 'cajero')) {
-                    throw new Error('Rol no válido');
-                }
-
-                localStorage.setItem('usuario', usuario);
-                localStorage.setItem('rol', rol);
-
-                if (rol === 'administrador') {
-                    window.location.href = 'index.html';
-                } else if (rol === 'cajero') {
-                    window.location.href = 'cajero.html';
-                }
-            } catch (error) {
-                document.getElementById('errorMessage').style.display = 'block';
-                console.error('Error en inicio de sesión:', error);
+            if (!response.ok) {
+                throw new Error(data.error || 'Error de autenticación');
             }
-        });
+
+            const rol = data.user.rol;
+
+            // Guardar en localStorage
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('currentUser', JSON.stringify(data.user));
+            localStorage.setItem('rol', rol);
+
+            // Redirigir según rol
+            if (rol === 'administrador') {
+                window.location.href = 'index.html';
+            } else if (rol === 'cajero') {
+                window.location.href = 'ventas.html';
+            } else {
+                throw new Error('Rol no válido');
+            }
+
+        } catch (error) {
+            console.error('Error en login:', error);
+            errorMsg.textContent = error.message;
+            errorMsg.style.display = 'block';
+        }
+    });
+
+
+   
     </script>
 </body>
-</html>
+</html> 

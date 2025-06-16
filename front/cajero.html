@@ -41,9 +41,9 @@
     const rol = localStorage.getItem('rol');
 console.log('Rol actual:', rol);
 
-if (rol !== 'admin' && window.location.pathname.includes('index.html')) {
+if (rol !== 'administrador' && window.location.pathname.includes('index.html')) {
     window.location.href = 'login.html';
-} else if (rol !== 'cashier' && window.location.pathname.includes('cajero.html')) {
+} else if (rol !== 'cajero' && window.location.pathname.includes('cajero.html')) {
     window.location.href = 'login.html';
 }
 

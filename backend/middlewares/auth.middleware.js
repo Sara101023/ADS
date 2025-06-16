@@ -3,7 +3,7 @@ const User = require('../models/user.model');
 
 // Configuración y constantes
 const JWT_CONFIG = {
-    SECRET: process.env.JWT_SECRET || 'secreto123',
+    SECRET: process.env.JWT_SECRET || 'secret_key',
     ERROR_MESSAGES: {
         NO_TOKEN: 'No se proporcionó token de autenticación',
         INVALID_TOKEN: 'Formato de token inválido',

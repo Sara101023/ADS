@@ -22,6 +22,9 @@ app.use((req, res, next) => {
 });
 
 // Archivos estáticos
+app.get('/', (req, res) => {
+  res.redirect('/login.html');
+});
 app.use(express.static(path.join(__dirname, '../front')));
 
 // Rutas de API

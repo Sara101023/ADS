@@ -1,58 +1,46 @@
-/**
- * Módulo de autenticación - Manejo de login, logout y protección de rutas
- */
-
-// Constantes
+// --- Constantes ---
 const LOGIN_ENDPOINT = '/api/auth/login';
 const PUBLIC_PAGES = ['login.html'];
 const ADMIN_HOME = 'index.html';
-const CASHIER_HOME = 'ventas.html';
+const CASHIER_HOME = 'ventasCajero.html';
 
-// Verificación de autenticación al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
+// --- Verificación al cargar la página ---
+document.addEventListener('DOMContentLoaded', () => {
     const currentPath = window.location.pathname.split('/').pop();
     const isPublicPage = PUBLIC_PAGES.includes(currentPath);
     const token = localStorage.getItem('token');
     const currentUser = getCurrentUser();
 
-    // Redirecciones según el estado de autenticación
+    // Si no hay token y no es página pública, redirige a login
     if (!isPublicPage && !token) {
         redirectToLogin();
         return;
     }
 
-    // Mostrar información del usuario logueado
-    if (currentUser) {
+    // Si hay usuario logueado
+    if (currentUser && token) {
         displayUserProfile(currentUser);
-        
-        // Redirigir según rol si está en página incorrecta
-        const isAdminPage = currentPath === 'index.html' || currentPath === 'usuarios.html';
-        const isCashierPage = currentPath === 'ventas.html';
-        
+
+        // Redirigir automáticamente si está en página equivocada
+        const isAdminPage = ['index.html', 'usuarios.html', 'inventario.html','reportes.html'].includes(currentPath);
+        const isCashierPage = currentPath === 'ventasCajero.html';
+
         if (currentUser.rol === 'administrador' && !isAdminPage) {
             window.location.href = ADMIN_HOME;
         } else if (currentUser.rol === 'cajero' && !isCashierPage) {
             window.location.href = CASHIER_HOME;
         }
     }
+
+    // Si estamos en login.html, limpiar cualquier sesión previa
+    if (currentPath === 'login.html') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('rol');
+    }
 });
 
-// Manejador del formulario de login
-const loginForm = document.getElementById('loginForm');
-if (loginForm) {
-    loginForm.addEventListener('submit', handleLogin);
-}
-
-// Manejador del botón de logout
-const logoutBtn = document.getElementById('logout-btn');
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', handleLogout);
-}
-
-/**
- * Funciones auxiliares
- */
-
+// --- Obtener usuario actual del localStorage ---
 function getCurrentUser() {
     const userData = localStorage.getItem('currentUser');
     try {
@@ -63,10 +51,7 @@ function getCurrentUser() {
     }
 }
 
-function redirectToLogin() {
-    window.location.href = 'login.html';
-}
-
+// --- Mostrar nombre del usuario en UI ---
 function displayUserProfile(user) {
     const profileSpan = document.querySelector('.user-profile span');
     if (profileSpan && user.nombre) {
@@ -74,14 +59,23 @@ function displayUserProfile(user) {
     }
 }
 
+// --- Redirigir al login ---
+function redirectToLogin() {
+    window.location.href = 'login.html';
+}
+
+// --- Manejador de login ---
+const loginForm = document.getElementById('loginForm');
+if (loginForm) {
+    loginForm.addEventListener('submit', handleLogin);
+}
+
 async function handleLogin(e) {
     e.preventDefault();
-
     const numero_trabajador = document.getElementById('numero_trabajador').value.trim();
     const contrasena = document.getElementById('password').value.trim();
     const errorElement = document.getElementById('errorMessage');
 
-    // Validación de campos
     if (!numero_trabajador || !contrasena) {
         showError(errorElement, 'Número de trabajador y contraseña son requeridos');
         return;
@@ -99,26 +93,29 @@ async function handleLogin(e) {
         if (response.ok) {
             processSuccessfulLogin(result);
         } else {
-            showError(errorElement, result.error || 'Credenciales inválidas');
+            throw new Error(result.error || 'Credenciales inválidas');
         }
     } catch (err) {
         console.error('Error de conexión:', err);
-        showError(errorElement, 'Error de conexión con el servidor');
+        showError(errorElement, err.message || 'Error de conexión con el servidor');
     }
 }
 
 function processSuccessfulLogin(result) {
     localStorage.setItem('token', result.token);
     localStorage.setItem('currentUser', JSON.stringify(result.user));
+    localStorage.setItem('rol', result.user.rol);
 
-    // Redirigir según rol
     if (result.user.rol === 'administrador') {
         window.location.href = ADMIN_HOME;
     } else if (result.user.rol === 'cajero') {
         window.location.href = CASHIER_HOME;
+    } else {
+        alert('Rol no reconocido. Contacta al administrador.');
     }
 }
 
+// --- Mostrar errores en pantalla ---
 function showError(element, message) {
     if (element) {
         element.textContent = message;
@@ -126,8 +123,15 @@ function showError(element, message) {
     }
 }
 
+// --- Cerrar sesión ---
+const logoutBtn = document.getElementById('logout-btn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', handleLogout);
+}
+
 function handleLogout() {
-    localStorage.removeItem('currentUser');
     localStorage.removeItem('token');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('rol');
     redirectToLogin();
 }

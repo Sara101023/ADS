@@ -19,15 +19,15 @@ const userController = {
      */
     getAllUsers: async (req, res) => {
         try {
-            const [users] = await pool.query(`
-                SELECT 
-                    u.id_usuario, 
-                    u.nombre, 
-                    u.numero_trabajador, 
-                    r.nombre AS rol
-                FROM usuario u
-                LEFT JOIN rol r ON u.id_rol = r.id_rol
-            `);
+          const [users] = await pool.query(`
+            SELECT 
+                u.id_usuario, 
+                u.nombre, 
+                u.numero_trabajador, 
+                r.nombre_rol AS rol
+            FROM usuario u
+            LEFT JOIN rol r ON u.id_rol = r.id_rol
+        `);
             res.json(users);
         } catch (error) {
             console.error('Error al obtener usuarios:', error);

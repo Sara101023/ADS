@@ -5,7 +5,7 @@ let allUsers = [];
 document.addEventListener('DOMContentLoaded', () => {
     cargarUsuarios();
     cargarRoles();
-    
+
     // Configurar event listeners para filtros
     document.getElementById('role-filter').addEventListener('change', renderUsers);
     document.getElementById('status-filter').addEventListener('change', renderUsers);
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- Funciones de carga de datos ---
 async function cargarRoles() {
     try {
-        const res = await fetch('/api/users/roles', {
+        const res = await fetch('/api/usuarios/roles', {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -36,7 +36,7 @@ async function cargarRoles() {
 
 async function cargarUsuarios() {
     try {
-        const res = await fetch('/api/users', {
+        const res = await fetch('/api/usuarios', {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -102,19 +102,23 @@ function editUser(id) {
 
     document.getElementById('user-id').value = user.id_usuario;
     document.getElementById('first-name').value = user.nombre;
-    document.getElementById('email').value = user.numero_trabajador;
+    document.getElementById('numero_trabajador').value = user.numero_trabajador;
     document.getElementById('role').value = user.id_rol;
+
+    // Ocultar contraseña y quitar required
     document.getElementById('password-group').style.display = 'none';
+    document.getElementById('password').removeAttribute('required');
 
     document.getElementById('modal-title').textContent = 'Editar Usuario';
     document.getElementById('user-modal').style.display = 'block';
 }
 
+
 async function deleteUser(id) {
     if (!confirm('¿Seguro que quieres eliminar este usuario?')) return;
 
     try {
-        const res = await fetch(`/api/users/${id}`, {
+        const res = await fetch(`/api/usuarios/${id}`, {
             method: 'DELETE',
             headers: { 
                 'Authorization': 'Bearer ' + localStorage.getItem('token'),
@@ -154,7 +158,7 @@ document.getElementById('reset-password-form').addEventListener('submit', async 
     }
 
     try {
-        const res = await fetch(`/api/users/${id}/reset-password`, {
+        const res = await fetch(`/api/usuarios/${id}/reset-password`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -181,10 +185,15 @@ document.getElementById('reset-password-form').addEventListener('submit', async 
 document.getElementById('add-user-btn').addEventListener('click', () => {
     document.getElementById('user-id').value = '';
     document.getElementById('user-form').reset();
+    
+    // Mostrar contraseña y aplicar required
     document.getElementById('password-group').style.display = 'block';
+    document.getElementById('password').setAttribute('required', 'required');
+
     document.getElementById('modal-title').textContent = 'Nuevo Usuario';
     document.getElementById('user-modal').style.display = 'block';
 });
+
 
 // --- Funciones de formularios ---
 document.getElementById('user-form').addEventListener('submit', async function(e) {
@@ -203,7 +212,7 @@ document.getElementById('user-form').addEventListener('submit', async function(e
     }
 
     try {
-        const url = isNew ? '/api/users' : `/api/users/${id}`;
+        const url = isNew ? '/api/usuarios' : `/api/usuarios/${id}`;
         const method = isNew ? 'POST' : 'PUT';
 
         const res = await fetch(url, {
