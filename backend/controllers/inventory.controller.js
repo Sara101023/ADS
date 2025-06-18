@@ -24,7 +24,9 @@ const inventoryController = {
             const products = await Product.getAll();
             res.json(products);
         } catch (error) {
-            handleServerError(res, 'Error al obtener productos:', error);
+            //handleServerError(res, 'Error al obtener productos:', error);
+            console.error('Error al obtener productos:', error);
+        res.status(500).json({ error: 'Error en el servidor' });
         }
     },
 

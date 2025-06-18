@@ -12,10 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentUser = getCurrentUser();
 
     // Si no hay token y no es página pública, redirige a login
-    if (!isPublicPage && !token) {
+    /*if (!isPublicPage && !token) {
+        redirectToLogin();
+        return;
+    }*/
+    
+        const isGuest = window.location.search.includes('guest=true');
+
+    if (!isPublicPage && !token && !isGuest) {
         redirectToLogin();
         return;
     }
+
 
     // Si hay usuario logueado
     if (currentUser && token) {
@@ -134,4 +142,12 @@ function handleLogout() {
     localStorage.removeItem('currentUser');
     localStorage.removeItem('rol');
     redirectToLogin();
+}
+
+// --- Redirección para botón de invitado ---
+const guestBtn = document.getElementById('guestBtn');
+if (guestBtn) {
+    guestBtn.addEventListener('click', function () {
+        window.location.href = 'ventas.html?guest=true';
+    });
 }

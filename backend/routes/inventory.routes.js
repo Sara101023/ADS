@@ -21,7 +21,12 @@ const authMiddleware = require('../middlewares/auth.middleware');
  *       200:
  *         description: Lista de productos
  */
-router.get('/products', inventoryController.getAllProducts);
+//router.get('/products', inventoryController.getAllProducts);
+const auth = require('../middlewares/auth.middleware');
+
+router.get('/products', auth.optionalAuth, inventoryController.getAllProducts);
+
+
 
 /**
  * @swagger

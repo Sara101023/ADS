@@ -23,11 +23,20 @@ window.onload = function() {
 };
 
 // --- Autenticación ---
-function checkAuth() {
+/*function checkAuth() {
     if (!user || (user.rol !== 'administrador' && user.rol !== 'cajero')) {
         window.location.href = 'login.html';
     }
+}*/
+function checkAuth() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isGuest = urlParams.get('guest') === 'true';
+
+    if (!isGuest && (!user || (user.rol !== 'administrador' && user.rol !== 'cajero'))) {
+        window.location.href = 'login.html';
+    }
 }
+
 
 // --- Configuración de modo invitado ---
 function setupGuestMode() {
@@ -59,11 +68,33 @@ function updateDateTime() {
 }
 
 // --- Funciones de productos ---
-async function loadProducts() {
+/*async function loadProducts() {
     try {
         const response = await fetch('http://localhost:4000/api/inventory/products');
 
         console.log('Status:', response.status);
+        const text = await response.text();
+        console.log('Respuesta cruda:', text);
+
+        products = JSON.parse(text);
+        renderProducts();
+    } catch (error) {
+        console.error('Error al cargar productos:', error);
+        alert('Error al cargar productos');
+    }
+}
+*/
+async function loadProducts() {
+    try {
+        const token = localStorage.getItem('token');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const response = await fetch('http://localhost:4000/api/inventory/products', {
+            method: 'GET',
+            headers
+        });
+
         const text = await response.text();
         console.log('Respuesta cruda:', text);
 
