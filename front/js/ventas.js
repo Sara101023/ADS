@@ -111,7 +111,7 @@ function renderProducts() {
     grid.innerHTML = '';
 
     const filteredProducts = currentCategory === 'Todos'
-        ? products
+        ? products.slice(0, 8) 
         : products.filter(p => (p.categoria || '').toLowerCase() === currentCategory.toLowerCase());
 
     filteredProducts.forEach(product => {
@@ -124,8 +124,7 @@ function renderProducts() {
             <p>Precio: $${product.precio}</p>
             <p>Stock: ${product.stock}</p>
             <p>Categoría: ${product.categoria}</p>
-            <button onclick="addToCart(${product.id_producto})">Agregar</button>
-        `;
+            <button class="btn-estilo" onclick="addToCart(${product.id_producto})">Agregar</button `;
         grid.appendChild(card);
     });
 }
@@ -166,19 +165,59 @@ function removeFromCart(productId) {
 
 function renderCart() {
     const cartTable = document.getElementById('cartTable');
+    
     cartTable.innerHTML = '';
+    if (cart.length === 0) {
+    const emptyMessage = document.createElement('p');
+    emptyMessage.textContent = "Aún no has comprado nada. ¡Empecemos ahora!";
+    emptyMessage.style.color = '#888';
+    emptyMessage.style.textAlign = 'center';
+    emptyMessage.style.marginTop = '10px';
+    cartTable.appendChild(emptyMessage);
+    // Oculta el botón
+        checkoutBtn.style.display = 'none';
+        
+    return;
+}
+// Muestra el botón si hay productos
+    checkoutBtn.style.display = 'block';
     cart.forEach(item => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${item.nombre}</td>
             <td>${item.cantidad}</td>
-            <td>${item.precio}</td>
-            <td><button onclick="removeFromCart(${item.id_producto})">Quitar</button></td>
+            <td>$${(item.precio * item.cantidad).toFixed(2)}</td>
+            <td style="text-align:center;">
+                <button class="btn-mini btn-red" onclick="decreaseQuantity(${item.id_producto})">–</button>
+                <span style="margin: 0 6px;">${item.cantidad}
+                <button class="btn-mini btn-black" onclick="increaseQuantity(${item.id_producto})">+</button>
+            </td>
         `;
         cartTable.appendChild(row);
     });
     updateTotals();
 }
+function increaseQuantity(id) {
+    const item = cart.find(p => p.id_producto === id);
+    if (item) {
+        item.cantidad++;
+        saveCart();
+        renderCart();
+    }
+}
+
+function decreaseQuantity(id) {
+    const item = cart.find(p => p.id_producto === id);
+    if (item) {
+        item.cantidad--;
+        if (item.cantidad <= 0) {
+            cart = cart.filter(p => p.id_producto !== id);
+        }
+        saveCart();
+        renderCart();
+    }
+}
+
 
 function updateTotals() {
     let subtotal = 0;

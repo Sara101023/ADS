@@ -181,16 +181,16 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        /* --- Carrito de compras --- */
+        /* --- Carrito de compras 
         .cart-container {
             background-color: white;
-            border-radius: 8px;
+            border: none;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: none;
             display: flex;
             flex-direction: column;
             gap: 15px;
-        }
+        }--- */
 
         #cartTable {
             width: 100%;
@@ -200,7 +200,7 @@
 
         #cartTable th, #cartTable td {
             padding: 8px;
-            border: 1px solid #ccc;
+            border: none;
             text-align: left;
         }
 
@@ -308,6 +308,56 @@
             cursor: pointer;
             color: red;
         }
+        .btn-estilo {
+    background-color: #00ff85;
+    color: black;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    max-width: 300px;
+}
+
+.btn-estilo:hover {
+    background-color: #00cc70;
+    transform: scale(1.02);
+}
+.btn-mini {
+    padding: 2px 5px;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 6px;
+    margin: 0 2px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.btn-black {
+    background-color: #00ff85;
+    color: #000000;
+}
+
+.btn-black:hover {
+    background-color: #333;
+}
+
+.btn-red {
+    background-color: #ff1900;
+    color: #fff;
+}
+
+.btn-red:hover {
+    background-color: #c0392b;
+}
+
+
 
         /* --- Responsive --- */
         @media (max-width: 768px) {
@@ -329,7 +379,7 @@
 <body>
     <!-- Banner de invitado -->
     <div class="guest-mode-banner" id="guestBanner">
-        <p>Estás comprando como invitado. <a href="login.html">Inicia sesión</a> para más funciones.</p>
+        <p>Estás comprando como invitado. <a href="login.html">Inicia sesión</a> para más funciones en caso de ser Cajero o Administrador.</p>
     </div>
 
     <!-- Contenido principal -->
@@ -410,8 +460,8 @@
         </main>
     </div>
 
-    <!-- Botón de invitado -->
-    <a href="#" class="guest-btn" id="guestBtn">Modo Invitado</a>
+    <!-- Botón de invitado 
+    <a href="#" class="guest-btn" id="guestBtn">Modo Invitado</a>-->
 
     <!-- Modal para datos de cliente -->
     <div id="emailModal">
