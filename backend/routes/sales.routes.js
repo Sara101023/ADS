@@ -2,37 +2,38 @@ const express = require('express');
 const router = express.Router();
 const salesController = require('../controllers/sales.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
-const { checkRoles } = require('../middlewares/role.middleware');
 
-// 🔐 Solo cajeros pueden procesar ventas y devoluciones
+// 🛒 Venta accesible como invitado o usuario autenticado
 router.post(
   '/',
-  authMiddleware.verifyToken,
-  checkRoles(['cajero']),
+  authMiddleware.optionalToken, // Permite token o modo invitado
   salesController.processSale
 );
 
-// 🔍 Cajeros pueden ver sus propias ventas
+// 📄 Cajeros pueden ver todas sus ventas
 router.get(
   '/',
   authMiddleware.verifyToken,
-  checkRoles(['cajero']),
+  authMiddleware.checkCajero,
   salesController.getAllSales
 );
 
+// 🔍 Cajero puede consultar una venta específica
 router.get(
   '/:id',
   authMiddleware.verifyToken,
-  checkRoles(['cajero']),
+  authMiddleware.checkCajero,
   salesController.getSaleById
 );
 
+/*
 // 🔁 Procesar devolución solo por cajero
 router.post(
   '/:saleId/returns',
   authMiddleware.verifyToken,
-  checkRoles(['cajero']),
+  authMiddleware.checkCajero,
   salesController.processReturn
 );
+*/
 
 module.exports = router;

@@ -2,82 +2,41 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const nodemailer = require('nodemailer');
+const fs = require('fs');
+const PDFDocument = require('pdfkit');
+const moment = require('moment');
 
 const app = express();
 const port = 4000;
 
+// ─────────────────────────────────────────────
+// MIDDLEWARES
 app.use(cors());
 app.use(express.json());
 
-const authRoutes = require('./routes/auth.routes');
+// SERVIR FRONTEND
+app.use(express.static(path.join(__dirname, '../front')));
+
+// REDIRECCIÓN INICIAL
+app.get('/', (req, res) => {
+  res.redirect('/login.html');
+});
+
+// ─────────────────────────────────────────────
+// RUTAS DE API
+app.use('/api/auth', require('./routes/auth.routes'));
+app.use('/api/usuarios', require('./routes/user.routes'));
+app.use('/api/inventory', require('./routes/inventory.routes'));
 app.use('/api/ventas', require('./routes/sales.routes'));
 
-app.use('/api/auth', authRoutes);
-app.use('/api/inventory', require('./routes/inventory.routes'));
-
-// Middleware para logs
+// LOGS DE PETICIONES
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
 
-// Archivos estáticos
-app.get('/', (req, res) => {
-  res.redirect('/login.html');
-});
-app.use(express.static(path.join(__dirname, '../front')));
-
-// Rutas de API
-app.use('/api/auth', require('./routes/auth.routes'));
-app.use('/api/usuarios', require('./routes/user.routes'));
-
-/* RUTA para envío de correos
-app.post('/enviar-correo', async (req, res) => {
-  const { nombre, correo, resumen, total } = req.body;
-
-  try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'ercioescom@gmail.com',         
-        pass: 'fuqiyuriauaimhzw'  
-      }
-    });
-
-    await transporter.sendMail({
-      from: '"ESCOMercio" <ercioescom@gmail.com>',
-      to: correo,
-      subject: 'Resumen de tu compra',
-      text: `Hola ${nombre}, gracias por tu compra.\n\nResumen:\n${resumen}\n\nTotal: $${total}`
-    });
-
-    res.json({ status: 'ok' });
-  } catch (error) {
-    console.error('Error al enviar correo:', error);
-    res.status(500).json({ status: 'error', error: error.message });
-  }
-});*/
-
-// Middleware de errores
-app.use((err, req, res, next) => {
-  console.error('[ERROR]', err.stack);
-  res.status(500).send('Algo salió mal!');
-});
-
-// Catch-all para rutas no encontradas
-app.get('*', (req, res) => {
-  res.status(404).send('Página no encontrada');
-});
-
-app.listen(port, () => {
-  console.log(`✅ Backend corriendo en: http://localhost:${port}`);
-  console.log(`✅ Frontend visible en: http://localhost:${port}/index.html`);
-});
-
-const PDFDocument = require('pdfkit');
-const moment = require('moment');
-const fs = require('fs');
-
+// ─────────────────────────────────────────────
+// GENERAR TICKET EN PDF Y ENVIAR POR CORREO
 
 function generarTicketPDF({ nombre, resumen, total, metodoPago, correo }, callback) {
   const doc = new PDFDocument();
@@ -108,8 +67,7 @@ function generarTicketPDF({ nombre, resumen, total, metodoPago, correo }, callba
   doc.text(`Total en letras: ${totalEnLetras}`);
   doc.text(`Método de pago: ${metodoPago}`);
   doc.moveDown();
-  doc.text('Este documento es una representación impresa de un CFDI.', { italics: true });
-  doc.moveDown();
+  doc.text('Este documento es una representación impresa de un CFDI.');
   doc.text('Política de devoluciones: Sujeta al reglamento en nuestro sitio web.');
   doc.text('Contacto: ercioescom@gmail.com | www.veremos');
   doc.moveDown();
@@ -121,7 +79,11 @@ function generarTicketPDF({ nombre, resumen, total, metodoPago, correo }, callba
   stream.on('finish', () => callback(filePath));
 }
 
-// ✉️ Enviar el correo
+function convertirNumeroALetras(numero) {
+  const formatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+  return formatter.formatToParts(numero).find(part => part.type === 'integer').value + ' Pesos';
+}
+
 app.post("/enviar-correo", (req, res) => {
   const { nombre, correo, resumen, total, metodoPago } = req.body;
 
@@ -138,11 +100,8 @@ app.post("/enviar-correo", (req, res) => {
       from: 'ercioescom@gmail.com',
       to: correo,
       subject: 'Tu recibo de compra',
-      text: `Hola ${nombre}, gracias por tu compra. Te adjuntamos tu ticket;D`,
-      attachments: [{
-        filename: 'ticket.pdf',
-        path: pdfPath
-      }]
+      text: `Hola ${nombre}, gracias por tu compra. Te adjuntamos tu ticket ;D`,
+      attachments: [{ filename: 'ticket.pdf', path: pdfPath }]
     };
 
     transporter.sendMail(mailOptions, (err, info) => {
@@ -158,9 +117,23 @@ app.post("/enviar-correo", (req, res) => {
   });
 });
 
+// ─────────────────────────────────────────────
+// ERRORES Y 404
 
-function convertirNumeroALetras(numero) {
-  const formatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
-  return formatter.formatToParts(numero).find(part => part.type === 'integer').value + ' Pesos';
-}
+app.use((err, req, res, next) => {
+  console.error('[ERROR]', err.stack);
+  res.status(500).send('Algo salió mal!');
+});
+
+app.get('*', (req, res) => {
+  res.status(404).send('Página no encontrada');
+});
+
+// ─────────────────────────────────────────────
+// INICIAR SERVIDOR
+
+app.listen(port, () => {
+  console.log(`✅ Backend corriendo en: http://localhost:${port}`);
+  console.log(`✅ Login: http://localhost:${port}/login.html`);
+});
 

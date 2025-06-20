@@ -1,273 +1,275 @@
- 
- <!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Inicio de Sesión</title>
-    <link rel="stylesheet" href="css/estilos.css" />
-    <style>
-        /* --- Estilos generales --- */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f5f6fa;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inicio de Sesión</title>
+  <link rel="stylesheet" href="css/estilos.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
-        .login-box {
-            background-color: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #34495e;
+      --accent-color: #00ff85;
+      --danger-color: #e74c3c;
+    }
 
-        .login-box h2 {
-            color: var(--primary-color);
-            margin-bottom: 30px;
-        }
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f5f6fa;
+    }
 
-        .login-box img {
-            width: 100px;
-            margin-bottom: 20px;
-        }
+    .login-box {
+      background-color: white;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+    }
 
-        /* --- Estilos de formulario --- */
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
+    .login-box h2 {
+      color: var(--primary-color);
+      margin-bottom: 30px;
+    }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--secondary-color);
-            font-weight: 500;
-        }
+    .login-box img {
+      width: 100px;
+      margin-bottom: 20px;
+    }
 
-        .form-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
 
-        .form-group input:focus {
-            border-color: var(--accent-color);
-            outline: none;
-        }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--secondary-color);
+      font-weight: 500;
+    }
 
-        /* --- Botones --- */
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--accent-color);
-            color: rgb(0, 0, 0);
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 10px;
-        }
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
 
-        .login-btn:hover {
-            background-color: #00cc70;
-        }
+    .form-group input:focus {
+      border-color: var(--accent-color);
+      outline: none;
+    }
 
-        .guest-btn {
-            position: absolute;
-            left: 20px;
-            bottom: 20px;
-            padding: 10px 20px;
-            background-color: #00ff85;
-            color: rgb(0, 0, 0);
-            border: none;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            text-decoration: none;
-        }
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--accent-color);
+      color: rgb(0, 0, 0);
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 10px;
+    }
 
-        .guest-btn:hover {
-            background-color: #00cc70;
-        }
+    .login-btn:hover {
+      background-color: #00cc70;
+    }
 
-        /* --- Selector de roles --- */
-        .role-selector {
-            margin-top: 20px;
-            text-align: center;
-        }
+    .guest-btn {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      padding: 10px 20px;
+      background-color: #00ff85;
+      color: rgb(0, 0, 0);
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      text-decoration: none;
+    }
 
-        .role-selector h3 {
-            margin-bottom: 15px;
-            color: var(--secondary-color);
-        }
+    .guest-btn:hover {
+      background-color: #00cc70;
+    }
 
-        .role-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
+    .role-selector {
+      margin-top: 20px;
+      text-align: center;
+    }
 
-        .role-btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            flex: 1;
-        }
+    .role-selector h2 {
+      margin-bottom: 15px;
+      color: var(--secondary-color);
+    }
 
-        .role-btn i {
-            font-size: 16px;
-        }
+    .role-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
 
-        .admin-btn {
-            background-color: #c0392b;
-            color: white;
-        }
+    .role-btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex: 1;
+    }
 
-        .cashier-btn {
-            background-color: #27ae60;
-            color: white;
-        }
+    .admin-btn {
+      background-color: #ff1b1b;
+      color: white;
+    }
 
-        .selected {
-            box-shadow: 0 0 0 2px var(--accent-color);
-        }
+    .cashier-btn {
+      background-color: #00ff85 ;
+      color: white;
+    }
 
-        /* --- Mensajes de error --- */
-        .error-message {
-            color: var(--danger-color);
-            margin-top: 15px;
-            font-size: 0.9rem;
-            display: none;
-        }
-    </style>
+    .selected {
+      box-shadow: 0 0 0 2px var(--accent-color);
+    }
+
+    .error-message {
+      color: var(--danger-color);
+      margin-top: 15px;
+      font-size: 0.9rem;
+      display: none;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="login-container">
-        <div class="login-box">
-            <img src="css/logo.png" alt="Logo Tienda" />
-            <h2>Iniciar Sesión</h2>
-            
-            <!-- Selector de roles -->
-            <div class="role-selector">
-                <h2>Selecciona tu rol</h2>
-                <div class="role-buttons">
-                    <button class="role-btn admin-btn" onclick="selectRole('admin')">
-                        <i class="fas fa-user-shield"></i>
-                        Administrador
-                    </button>
-                    <button class="role-btn cashier-btn" onclick="selectRole('cashier')">
-                        <i class="fas fa-cash-register"></i>
-                        Cajero
-                    </button>
-                </div>
-            </div>
+  <div class="login-container">
+    <div class="login-box">
+      <img src="css/logo.png" alt="Logo Tienda" />
+      <h2>Iniciar Sesión</h2>
 
-            <!-- Formulario de login -->
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="numero_trabajador">Usuario</label>
-                    <input type="text" id="numero_trabajador" required />
-                </div>
-                <div class="form-group">
-                    <label for="password">Contraseña</label>
-                    <input type="password" id="password" required />
-                </div>
-                <button type="submit" class="login-btn">Ingresar</button>
-                <div id="errorMessage" class="error-message">Usuario o contraseña incorrectos</div>
-            </form>
+      <!-- Selector de roles -->
+      <div class="role-selector">
+        <h2>Selecciona tu rol</h2>
+        <div class="role-buttons">
+          <button class="role-btn admin-btn" onclick="selectRole('admin')">
+            <i class="fas fa-user-shield"></i>
+            Administrador
+          </button>
+          <button class="role-btn cashier-btn" onclick="selectRole('cashier')">
+            <i class="fas fa-cash-register"></i>
+            Cajero
+          </button>
         </div>
+      </div>
 
-        <!-- Botón de compra como invitado -->
-        <button class="guest-btn" id="guestBtn">Comprar ahora</button>
+      <!-- Formulario de login -->
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="numero_trabajador">Usuario</label>
+          <input type="text" id="numero_trabajador" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" required />
+        </div>
+        <button type="submit" class="login-btn">Ingresar</button>
+        <div id="errorMessage" class="error-message">Usuario o contraseña incorrectos</div>
+      </form>
+
+      
     </div>
+    <button class="guest-btn" id="guestBtn">Comprar ahora</button>
+  </div>
 
-    <script src="js/auth.js"></script>
-    <script>
-        // --- Variables ---
-        let rolSeleccionado = null;
+  <!-- Script principal -->
+  <script>
+    let rolSeleccionado = null;
 
-        // --- Funciones ---
-        function selectRole(rol) {
-            rolSeleccionado = rol;
-            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('selected'));
-            if (rol === 'admin') {
-                document.querySelector('.admin-btn').classList.add('selected');
-            } else if (rol === 'cashier') {
-                document.querySelector('.cashier-btn').classList.add('selected');
-            }
+    function selectRole(rol) {
+      rolSeleccionado = rol;
+      document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('selected'));
+      if (rol === 'admin') {
+        document.querySelector('.admin-btn').classList.add('selected');
+      } else if (rol === 'cashier') {
+        document.querySelector('.cashier-btn').classList.add('selected');
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const numero_trabajador = document.getElementById('numero_trabajador').value.trim();
+      const contrasena = document.getElementById('password').value.trim();
+      const errorMsg = document.getElementById('errorMessage');
+
+      if (!rolSeleccionado) {
+        errorMsg.textContent = 'Por favor selecciona un rol antes de ingresar.';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:4000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ numero_trabajador, contrasena })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Error de autenticación');
         }
 
-        // --- Event Listeners ---
+        const rolReal = data.user.rol;
 
-    
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        const numero_trabajador = document.getElementById('numero_trabajador').value.trim();
-        const contrasena = document.getElementById('password').value.trim();
-        const errorMsg = document.getElementById('errorMessage');
-
-        try {
-            const response = await fetch('http://localhost:4000/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ numero_trabajador, contrasena })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Error de autenticación');
-            }
-
-            const rol = data.user.rol;
-
-            // Guardar en localStorage
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('currentUser', JSON.stringify(data.user));
-            localStorage.setItem('rol', rol);
-
-            // Redirigir según rol
-            if (rol === 'administrador') {
-                window.location.href = 'index.html';
-            } else if (rol === 'cajero') {
-                window.location.href = 'ventas.html';
-            } else {
-                throw new Error('Rol no válido');
-            }
-
-        } catch (error) {
-            console.error('Error en login:', error);
-            errorMsg.textContent = error.message;
-            errorMsg.style.display = 'block';
+        if (
+          (rolSeleccionado === 'admin' && rolReal !== 'administrador') ||
+          (rolSeleccionado === 'cashier' && rolReal !== 'cajero')
+        ) {
+          throw new Error(`No tienes permisos como ${rolSeleccionado === 'admin' ? 'Administrador' : 'Cajero'}.`);
         }
+
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('currentUser', JSON.stringify(data.user));
+        localStorage.setItem('rol', rolReal);
+
+        if (rolReal === 'administrador') {
+          window.location.href = 'index.html';
+        } else if (rolReal === 'cajero') {
+          window.location.href = 'ventas.html';
+        }
+
+      } catch (error) {
+        console.error('Error en login:', error);
+        errorMsg.textContent = error.message;
+        errorMsg.style.display = 'block';
+      }
     });
-  
-    </script>
-    <script>
+
     document.getElementById('guestBtn').addEventListener('click', function () {
-        window.location.href = 'ventas.html?guest=true';
+      window.location.href = 'ventas.html?guest=true';
     });
-</script>
-
+  </script>
 </body>
-</html> 
+</html>

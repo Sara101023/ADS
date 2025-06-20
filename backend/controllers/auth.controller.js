@@ -93,7 +93,8 @@ function formatUserResponse(user) {
         id: user.id_usuario,
         nombre: user.nombre,
         numero_trabajador: user.numero_trabajador,
-        rol: user.rol || user.nombre_rol // Usa el campo correcto según tu modelo
+        rol: user.nombre_rol
+
     };
 }
 

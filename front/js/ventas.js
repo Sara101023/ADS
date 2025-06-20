@@ -250,7 +250,7 @@ function clearCart() {
 }
 
 // --- Funciones de venta ---
-async function procesarVenta() {
+async function Venta() {
     if (cart.length === 0) {
         alert('El carrito está vacío');
         return;
@@ -288,17 +288,9 @@ async function procesarVenta() {
 }
 
 function guestCheckout() {
-    const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || 'efectivo';
-
-    if (paymentMethod === 'card') {
-        abrirModal();
-        return;
-    }
-
-    const nombre = "Invitado";
-    const correo = "noreply@ventas.com";
-    procesarVenta(nombre, correo, paymentMethod);
+    abrirModal(); //  Siempre abrir modal, no importa el método de pago
 }
+
 
 // --- Funciones de modales ---
 function abrirModal() {
@@ -390,5 +382,45 @@ categoryBtns.forEach(btn => {
             const metodoPago = document.querySelector('input[name="payment"]:checked')?.value || 'Efectivo';
             procesarVenta(nombre, correo, metodoPago);
         });
+    }
+}
+
+async function procesarVenta(nombre = 'Invitado', correo = 'noreply@ventas.com', metodoPago = 'Efectivo') {
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+
+    // Solo agregar el token si NO es invitado
+  
+const token = localStorage.getItem('token');
+if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+}
+
+
+    try {
+        const response = await fetch('http://localhost:4000/api/ventas', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+                productos: cart,
+                metodo_pago: metodoPago,
+                cliente: { nombre, correo }
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert('✅ Venta realizada y ticket enviado');
+            clearCart();
+            loadProducts();
+            cerrarModal();
+        } else {
+            alert(`❌ Error al procesar la venta: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Error de red:', error);
+        alert('Error de red al procesar la venta');
     }
 }

@@ -2,7 +2,7 @@
 const LOGIN_ENDPOINT = '/api/auth/login';
 const PUBLIC_PAGES = ['login.html'];
 const ADMIN_HOME = 'index.html';
-const CASHIER_HOME = 'ventasCajero.html';
+const CASHIER_HOME = 'ventas.html';
 
 // --- Verificación al cargar la página ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,41 +10,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const isPublicPage = PUBLIC_PAGES.includes(currentPath);
     const token = localStorage.getItem('token');
     const currentUser = getCurrentUser();
+    const isGuest = window.location.search.includes('guest=true');
 
-    // Si no hay token y no es página pública, redirige a login
-    /*if (!isPublicPage && !token) {
-        redirectToLogin();
-        return;
-    }*/
-    
-        const isGuest = window.location.search.includes('guest=true');
-
+    // 🔒 Si no tiene token y no es invitado ni página pública → redirigir a login
     if (!isPublicPage && !token && !isGuest) {
         redirectToLogin();
         return;
     }
 
-
-    // Si hay usuario logueado
-    if (currentUser && token) {
-        displayUserProfile(currentUser);
-
-        // Redirigir automáticamente si está en página equivocada
-        const isAdminPage = ['index.html', 'usuarios.html', 'inventario.html','reportes.html'].includes(currentPath);
-        const isCashierPage = currentPath === 'ventasCajero.html';
-
-        if (currentUser.rol === 'administrador' && !isAdminPage) {
-            window.location.href = ADMIN_HOME;
-        } else if (currentUser.rol === 'cajero' && !isCashierPage) {
-            window.location.href = CASHIER_HOME;
-        }
-    }
-
-    // Si estamos en login.html, limpiar cualquier sesión previa
+    // 🧼 Si estamos en login.html, limpiar sesión previa (y no redirigir)
     if (currentPath === 'login.html') {
         localStorage.removeItem('token');
         localStorage.removeItem('currentUser');
         localStorage.removeItem('rol');
+    }
+
+    // Mostrar el nombre del usuario si está logueado y ya entró a una página autorizada
+    if (currentUser && token) {
+        displayUserProfile(currentUser);
     }
 });
 
@@ -144,7 +127,7 @@ function handleLogout() {
     redirectToLogin();
 }
 
-// --- Redirección para botón de invitado ---
+// --- Botón de invitado ---
 const guestBtn = document.getElementById('guestBtn');
 if (guestBtn) {
     guestBtn.addEventListener('click', function () {

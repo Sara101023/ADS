@@ -10,7 +10,8 @@ const authMiddleware = require('../middlewares/auth.middleware');
  *   description: Gestión de productos del inventario
  */
 
-// Rutas públicas
+// 🟢 Rutas públicas
+
 /**
  * @swagger
  * /api/inventory/products:
@@ -21,12 +22,7 @@ const authMiddleware = require('../middlewares/auth.middleware');
  *       200:
  *         description: Lista de productos
  */
-//router.get('/products', inventoryController.getAllProducts);
-const auth = require('../middlewares/auth.middleware');
-
-router.get('/products', auth.optionalAuth, inventoryController.getAllProducts);
-
-
+router.get('/products', authMiddleware.optionalToken, inventoryController.getAllProducts);
 
 /**
  * @swagger
@@ -34,17 +30,6 @@ router.get('/products', auth.optionalAuth, inventoryController.getAllProducts);
  *   get:
  *     summary: Obtiene un producto por ID
  *     tags: [Inventario]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Producto encontrado
- *       404:
- *         description: Producto no encontrado
  */
 router.get('/products/:id', inventoryController.getProductById);
 
@@ -54,50 +39,23 @@ router.get('/products/:id', inventoryController.getProductById);
  *   get:
  *     summary: Obtiene un producto por código de barras
  *     tags: [Inventario]
- *     parameters:
- *       - in: path
- *         name: barcode
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Producto encontrado
- *       404:
- *         description: Producto no encontrado
  */
 router.get('/products/barcode/:barcode', inventoryController.getProductByBarcode);
 
-// Rutas protegidas (requieren autenticación y rol de administrador)
+// 🔒 Rutas protegidas (solo admin)
+
 /**
  * @swagger
  * /api/inventory/products:
  *   post:
  *     summary: Crea un nuevo producto (Admin)
  *     tags: [Inventario]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Product'
- *     responses:
- *       201:
- *         description: Producto creado exitosamente
- *       400:
- *         description: Datos inválidos
- *       401:
- *         description: No autorizado
- *       403:
- *         description: No tiene permisos
  */
 router.post(
-    '/products',
-    authMiddleware.verifyToken,
-    authMiddleware.checkAdmin,
-    inventoryController.createProduct
+  '/products',
+  authMiddleware.verifyToken,
+  authMiddleware.checkAdmin,
+  inventoryController.createProduct
 );
 
 /**
@@ -106,37 +64,12 @@ router.post(
  *   put:
  *     summary: Actualiza un producto existente (Admin)
  *     tags: [Inventario]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Product'
- *     responses:
- *       200:
- *         description: Producto actualizado
- *       400:
- *         description: Datos inválidos
- *       401:
- *         description: No autorizado
- *       403:
- *         description: No tiene permisos
- *       404:
- *         description: Producto no encontrado
  */
 router.put(
-    '/products/:id',
-    authMiddleware.verifyToken,
-    authMiddleware.checkAdmin,
-    inventoryController.updateProduct
+  '/products/:id',
+  authMiddleware.verifyToken,
+  authMiddleware.checkAdmin,
+  inventoryController.updateProduct
 );
 
 /**
@@ -145,29 +78,12 @@ router.put(
  *   delete:
  *     summary: Desactiva un producto (Admin)
  *     tags: [Inventario]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Producto desactivado
- *       401:
- *         description: No autorizado
- *       403:
- *         description: No tiene permisos
- *       404:
- *         description: Producto no encontrado
  */
 router.delete(
-    '/products/:id',
-    authMiddleware.verifyToken,
-    authMiddleware.checkAdmin,
-    inventoryController.deactivateProduct
+  '/products/:id',
+  authMiddleware.verifyToken,
+  authMiddleware.checkAdmin,
+  inventoryController.deactivateProduct
 );
 
 /**
@@ -176,23 +92,12 @@ router.delete(
  *   get:
  *     summary: Obtiene productos con stock bajo (Admin)
  *     tags: [Inventario]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Lista de productos con stock bajo
- *       401:
- *         description: No autorizado
- *       403:
- *         description: No tiene permisos
  */
 router.get(
-    '/low-stock',
-    authMiddleware.verifyToken,
-    authMiddleware.checkAdmin,
-    inventoryController.checkLowStock
+  '/low-stock',
+  authMiddleware.verifyToken,
+  authMiddleware.checkAdmin,
+  inventoryController.checkLowStock
 );
-
-// Eliminé las rutas duplicadas y el código de servidor que no pertenecía aquí
 
 module.exports = router;
