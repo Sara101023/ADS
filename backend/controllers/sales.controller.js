@@ -62,7 +62,7 @@ if (![1, 2].includes(metodoPagoId)) {
                 }
 
                 const itemSubtotal = finalPrice * finalQuantity;
-                const itemIva = product.tiene_iva ? itemSubtotal * 0.16 : 0;
+const itemIva = product.tiene_iva ? product.precio * item.cantidad * 0.16 : 0;
 
                 subtotal += itemSubtotal;
                 iva += itemIva;
