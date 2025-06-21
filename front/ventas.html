@@ -447,13 +447,6 @@
                             <span id="total">$0.00</span>
                         </div>
                     </div>
-
-                    <div class="payment-methods">
-                        <h4>Método de Pago</h4>
-                        <label><input type="radio" name="payment" value="cash" checked> Efectivo</label>
-                        <label><input type="radio" name="payment" value="card"> Tarjeta</label>
-                    </div>
-
                     <button class="checkout-btn" id="checkoutBtn">Finalizar Venta</button>
                 </div>
             </div>
@@ -466,20 +459,25 @@
     <!-- Modal para datos de cliente -->
     <div id="emailModal">
         <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h2>Ingresa tus datos para recibir el ticket</h2>
+    <span class="close-btn">&times;</span>
+    <h2>Ingresa tus datos para recibir el ticket</h2>
 
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" placeholder="Tu nombre" required>
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" placeholder="Tu nombre" required>
 
-            <label for="correo">Correo electrónico:</label>
-            <input type="email" id="correo" placeholder="ejemplo@correo.com" required>
+    <label for="correo">Correo electrónico:</label>
+    <input type="email" id="correo" placeholder="ejemplo@correo.com" required>
 
-            <div class="modal-buttons">
-                <button type="submit" id="enviarBtn">Enviar</button>
-                <button type="button" id="cancelarBtn">Cancelar</button>
-            </div>
-        </div>
+    <h4>Método de Pago</h4>
+    <label><input type="radio" name="payment" value="Efectivo" checked> Efectivo</label><br>
+    <label><input type="radio" name="payment" value="Tarjeta"> Tarjeta</label>
+
+    <div class="modal-buttons">
+        <button type="submit" id="enviarBtn">Enviar</button>
+        <button type="button" id="cancelarBtn">Cancelar</button>
+    </div>
+</div>
+
     </div>
 
     <!-- Scripts -->
@@ -499,11 +497,11 @@
         updateDateTime(); // Llamar inmediatamente
 
         // Ejemplo de funcionalidad para el botón de invitado
-        document.getElementById('guestBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            const guestBanner = document.getElementById('guestBanner');
-            guestBanner.style.display = guestBanner.style.display === 'none' ? 'block' : 'none';
-        });
+        //document.getElementById('guestBtn').addEventListener('click', function(e) {
+           // e.preventDefault();
+           // const guestBanner = document.getElementById('guestBanner');
+          //  guestBanner.style.display = guestBanner.style.display === 'none' ? 'block' : 'none';
+       // });
     </script>
 </body>
 </html>

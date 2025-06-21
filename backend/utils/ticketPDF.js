@@ -11,6 +11,11 @@ function convertirNumeroALetras(numero) {
 }
 
 function generarTicketPDF(venta, nombreCliente, callback) {
+  if (!venta || !venta.items || !venta.fecha) {
+    console.error("❌ Datos insuficientes para generar el ticket PDF:", venta);
+    return callback(null);
+  }
+
   const doc = new PDFDocument();
   const filePath = path.join(__dirname, '../temp_ticket.pdf');
   const stream = fs.createWriteStream(filePath);
@@ -32,16 +37,16 @@ function generarTicketPDF(venta, nombreCliente, callback) {
   venta.items.forEach(item => {
     const nombre = item.nombre || 'Producto';
     const cantidad = item.cantidad;
-    const precio = `$${item.precio_unitario.toFixed(2)}`;
-    const importe = `$${(item.precio_unitario * item.cantidad).toFixed(2)}`;
+const precio = `$${Number(item.precio_unitario).toFixed(2)}`;
+const importe = `$${(Number(item.precio_unitario) * item.cantidad).toFixed(2)}`;
     doc.text(`${cantidad} x ${nombre} - ${precio} -> ${importe}`);
   });
 
   doc.text('---------------------------------------------');
   doc.fontSize(10);
-  doc.text(`Subtotal: $${subtotal}`);
-  doc.text(`IVA (16%): $${iva}`);
-  doc.text(`Total: $${total}`);
+  doc.text(`Subtotal: $${subtotal}`, { align: 'right' });
+  doc.text(`IVA (16%): $${iva}`, { align: 'right' });
+  doc.text(`Total: $${total}`, { align: 'right' });
   doc.text(`Total en letras: ${totalLetras}`);
   doc.text(`Método de pago: ${venta.metodo_pago}`);
   doc.moveDown();

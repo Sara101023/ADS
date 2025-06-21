@@ -193,7 +193,7 @@ function setupEventListeners() {
         if (!row) return;
         
         const productId = parseInt(row.dataset.id);
-        const product = inventoryProducts.find(p => p.id_producto === productId);
+        const product = inventoryProducts.find(p => p.id_promocion_producto === productId);
         
         if (e.target.classList.contains('edit-btn')) {
             openProductModal(product);

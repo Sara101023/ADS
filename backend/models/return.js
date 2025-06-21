@@ -6,7 +6,7 @@ class Return {
             `SELECT d.*, dv.id_producto, dv.stock, p.nombre as producto_nombre 
              FROM devolucion d
              JOIN motivo dv ON d.id = dv.id.devolucion
-             JOIN producto p ON dv.id_producto = p.id
+             JOIN producto p ON dv.id_producto = p.id_promocion
              WHERE d.id = ?`,
             [id]
         );
