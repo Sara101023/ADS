@@ -31,7 +31,7 @@ const salesController = {
                 // Verificar stock
                 if (product.stock < item.cantidad) {
                     return res.status(400).json({ 
-                        error: `Stock insuficiente para ${product.nombre} (disponible: ${product.stock}, solicitado: ${item.cantidad})`
+                        error: `Stock insuficiente para ${product.nombre} `
                     });
                 }
                 

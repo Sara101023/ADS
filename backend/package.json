@@ -24,6 +24,7 @@
     "morgan": "^1.10.0",
     "mysql2": "^3.6.0",
     "nodemailer": "^6.10.1",
+    "number-to-words": "^1.2.4",
     "numero-a-letras": "^1.0.6",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

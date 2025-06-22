@@ -86,22 +86,35 @@ function renderProducts() {
         card.classList.add('product-card');
         card.setAttribute('data-category', (product.categoria || 'otros').toLowerCase());
 
+        // Crear elemento de stock con formato condicional
+        const stockClass = product.stock <= 3 ? 'stock-bajo' : '';
+        const stockText = `<p class="${stockClass}">Stock: ${product.stock}</p>`;
+
+        // Crear el botón según stock
+        const btn = document.createElement('button');
+        if (product.stock === 0) {
+            btn.textContent = 'Sin stock';
+            btn.disabled = true;
+            btn.style.backgroundColor = '#ccc';
+            btn.style.cursor = 'not-allowed';
+        } else {
+            btn.textContent = 'Agregar';
+            btn.classList.add('btn-estilo');
+            btn.addEventListener('click', () => addToCart(product.id_producto));
+        }
+
+        // Ensamblar tarjeta
         card.innerHTML = `
             <h4>${product.nombre}</h4>
             <p>Precio: $${product.precio}</p>
-            <p>Stock: ${product.stock}</p>
+            ${stockText}
             <p>Categoría: ${product.categoria}</p>
         `;
-
-        const btn = document.createElement('button');
-        btn.textContent = 'Agregar';
-        btn.classList.add('btn-estilo');
-        btn.addEventListener('click', () => addToCart(product.id_producto));
-
         card.appendChild(btn);
         grid.appendChild(card);
     });
 }
+
 
 function saveCart() {
     localStorage.setItem('cart', JSON.stringify(cart));
@@ -114,20 +127,22 @@ function loadCart() {
 }
 
 function addToCart(productId) {
-    if (typeof productId !== 'number' || isNaN(productId)) {
-        alert("❌ ID de producto inválido");
-        return;
-    }
-
     const product = products.find(p => p.id_producto === productId);
     if (!product) {
-        alert("❌ Producto no encontrado");
+        mostrarErrorModal('Producto no encontrado');
         return;
     }
 
-    console.log("🛒 Agregando al carrito:", product);
-
     const item = cart.find(i => i.id_producto === productId);
+    const cantidadEnCarrito = item ? item.cantidad : 0;
+
+    // Verificar si la nueva cantidad supera el stock disponible
+    if (cantidadEnCarrito + 1 > product.stock) {
+        mostrarErrorModal('no_stock', product.nombre);
+        return;
+    }
+
+    // Agregar o aumentar cantidad
     if (item) {
         item.cantidad += 1;
     } else {
@@ -137,6 +152,8 @@ function addToCart(productId) {
     saveCart();
     renderCart();
 }
+
+
 
 function removeFromCart(productId) {
     cart = cart.filter(item => item.id_producto !== productId);
@@ -178,12 +195,20 @@ function renderCart() {
 }
 function increaseQuantity(id) {
     const item = cart.find(p => p.id_producto === id);
-    if (item) {
-        item.cantidad++;
-        saveCart();
-        renderCart();
+    const product = products.find(p => p.id_producto === id);
+    
+    if (!item || !product) return;
+
+    if (item.cantidad >= product.stock) {
+        mostrarErrorModal('no_stock', product.nombre);
+        return;
     }
+
+    item.cantidad++;
+    saveCart();
+    renderCart();
 }
+
 
 function decreaseQuantity(id) {
     const item = cart.find(p => p.id_producto === id);
@@ -220,9 +245,10 @@ function updateTotals() {
 
 function clearCart() {
     cart = [];
-    saveCart();
+    localStorage.removeItem('cart'); // Asegura limpieza completa
     renderCart();
 }
+
 
 async function Venta() {
     if (cart.length === 0) {
@@ -287,6 +313,18 @@ function cerrarModal() {
 }
 
 function setupEventListeners() {
+    const clearCartBtn = document.getElementById('clearCartBtn');
+    if (clearCartBtn) {
+        clearCartBtn.addEventListener('click', function () {
+            abrirClearCartModal(); // Modal bonito
+        });
+    }
+
+    const cerrarErrorBtn = document.getElementById("cerrarErrorBtn");
+    if (cerrarErrorBtn) {
+        cerrarErrorBtn.addEventListener("click", cerrarErrorModal);
+    }
+
     const categoryBtns = document.querySelectorAll('.category-btn');
     categoryBtns.forEach(btn => {
         btn.addEventListener('click', function () {
@@ -311,6 +349,7 @@ function setupEventListeners() {
             }
         });
     }
+
     const searchInput = document.querySelector('.search-bar input');
     if (searchInput) {
         searchInput.addEventListener('input', function (e) {
@@ -323,6 +362,7 @@ function setupEventListeners() {
             });
         });
     }
+
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function () {
@@ -330,12 +370,15 @@ function setupEventListeners() {
             window.location.href = 'login.html';
         });
     }
+
     const emailForm = document.getElementById('emailForm');
     const enviarBtn = document.getElementById("enviarBtn");
     const cancelarBtn = document.getElementById("cancelarBtn");
+
     if (cancelarBtn) {
         cancelarBtn.addEventListener("click", cerrarModal);
     }
+
     if (enviarBtn) {
         enviarBtn.addEventListener("click", function (e) {
             e.preventDefault();
@@ -355,6 +398,7 @@ function setupEventListeners() {
         });
     }
 }
+
 
 async function procesarVenta(nombre = 'Invitado', correo = 'noreply@ventas.com', metodoPago = 'Efectivo') {
     const headers = {
@@ -391,15 +435,60 @@ async function procesarVenta(nombre = 'Invitado', correo = 'noreply@ventas.com',
         });
         const result = await response.json();
         if (response.ok) {
-            alert('✅ Venta realizada y ticket enviado');
+           // alert('✅ Venta realizada y ticket enviado');
+           mostrarSuccessModal(nombre, correo);
+
             clearCart();
             loadProducts();
             cerrarModal();
         } else {
-            alert(`❌ Error al procesar la venta: ${result.error}`);
-        }
+    const result = await response.json();
+    mostrarErrorModal(result.error, result.producto);
+}
+
     } catch (error) {
         console.error('Error de red:', error);
         alert('Error de red al procesar la venta');
     }
 }
+function mostrarErrorModal(errorCode, producto = '') {
+    const modal = document.getElementById("errorModal");
+    const mensajeElemento = document.getElementById("errorMensaje");
+
+    if (errorCode === 'no_stock' && producto) {
+        mensajeElemento.innerHTML = `Lo siento, por el momento no tenemos stock suficiente para <strong>${producto}</strong> 🫠`;
+    } else {
+        mensajeElemento.innerText = errorCode;
+    }
+
+    modal.style.display = "flex";
+}
+
+function cerrarErrorModal() {
+    document.getElementById("errorModal").style.display = "none";
+}
+function mostrarSuccessModal(nombre, correo) {
+  const modal = document.getElementById("successModal");
+  const mensajeElemento = document.getElementById("successMensaje");
+  mensajeElemento.innerHTML = `🎉 Gracias <strong>${nombre}</strong>, tu ticket ha sido enviado correctamente a <strong>${correo}</strong>.🎉`;
+
+  modal.style.display = "flex";
+
+  setTimeout(() => {
+    modal.style.display = "none";
+  }, 4000);
+}
+
+function abrirClearCartModal() {
+    document.getElementById("clearCartModal").style.display = "flex";
+}
+
+function cerrarClearCartModal() {
+    document.getElementById("clearCartModal").style.display = "none";
+}
+
+function confirmarClearCart() {
+    clearCart();
+    cerrarClearCartModal();
+}
+

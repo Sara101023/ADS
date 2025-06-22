@@ -18,11 +18,11 @@ const salesController = {
             }
 
             const metodoPagoId = parseInt(metodo_pago);
-if (![1, 2].includes(metodoPagoId)) {
-    return res.status(400).json({ error: 'Método de pago inválido' });
-}
+            if (![1, 2].includes(metodoPagoId)) {
+                return res.status(400).json({ error: 'Método de pago inválido' });
+            }
 
-          
+
 
             let subtotal = 0;
             let iva = 0;
@@ -30,15 +30,17 @@ if (![1, 2].includes(metodoPagoId)) {
 
             for (const item of items) {
                 const product = await Product.getById(item.id_producto);
+                console.log(`Producto: ${product.nombre}, tiene_iva: ${product.tiene_iva}`);
                 if (!product) {
                     return res.status(400).json({ error: `Producto con ID ${item.id_producto} no encontrado` });
                 }
 
-                if (product.stock < item.cantidad) {
-                    return res.status(400).json({
-                        error: `Stock insuficiente para ${product.nombre} (disponible: ${product.stock}, solicitado: ${item.cantidad})`
-                    });
-                }
+               if (product.stock < item.cantidad) {
+    return res.status(400).json({
+        error: 'no_stock',
+        producto: product.nombre
+    });
+}
 
                 const promotions = await Promotion.getActivePromotionsForProduct(item.id_producto);
                 let discount = 0;
@@ -62,7 +64,7 @@ if (![1, 2].includes(metodoPagoId)) {
                 }
 
                 const itemSubtotal = finalPrice * finalQuantity;
-const itemIva = product.tiene_iva ? product.precio * item.cantidad * 0.16 : 0;
+                const itemIva = product.tiene_iva ? product.precio * item.cantidad * 0.16 : 0;
 
                 subtotal += itemSubtotal;
                 iva += itemIva;
@@ -127,7 +129,7 @@ const itemIva = product.tiene_iva ? product.precio * item.cantidad * 0.16 : 0;
                 };
 
                 transporter.sendMail(mailOptions, (err, info) => {
-                    try { fs.unlinkSync(pdfPath); } catch (e) {}
+                    try { fs.unlinkSync(pdfPath); } catch (e) { }
                     if (err) console.error('❌ Error al enviar ticket PDF:', err);
                     else console.log('✅ Ticket PDF enviado a:', correoCliente);
                 });

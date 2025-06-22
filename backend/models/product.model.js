@@ -36,12 +36,15 @@ class Product {
      * @returns {Promise<Object|null>} Producto encontrado o null
      */
     static async getById(id) {
-        const [rows] = await pool.query(`
-            SELECT * FROM producto 
-            WHERE id_producto = ?
-        `, [id]);
-        return rows[0] || null;
-    }
+    const [rows] = await pool.query(`
+        SELECT id_producto, nombre, descripcion, precio, stock, codigo_barras,
+               id_proveedor, estado, fecha_desactivacion, categoria, tiene_iva
+        FROM producto 
+        WHERE id_producto = ?
+    `, [id]);
+    return rows[0] || null;
+}
+
 
     /**
      * Obtiene un producto por código de barras
