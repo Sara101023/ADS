@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="css/estilos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <div class="dashboard-container">
         <aside class="sidebar">
@@ -37,6 +39,7 @@
                     <button id="add-promo-btn" class="btn-primary">
                         <i class="fas fa-plus"></i> Nueva Promoción
                     </button>
+
                 </div>
             </header>
 
@@ -60,9 +63,11 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <button id="search-btn" class="btn-secondary">
-                        <i class="fas fa-search"></i> Buscar
+
+                    <button class="btn-search">
+                        <i class="fas fa-search"></i>
                     </button>
+
                 </div>
             </div>
 
@@ -79,50 +84,10 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Ejemplo de datos estático -->
-                        <tr>
-                            <td>Verano 20%</td>
-                            <td>Porcentaje</td>
-                            <td>20%</td>
-                            <td>Todos</td>
-                            <td>15/08/2023</td>
-                            <td><span class="status-badge active">Activa</span></td>
-                            <td>
-                                <button class="btn-edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-delete"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2x1 Refrescos</td>
-                            <td>Compra X lleva Y</td>
-                            <td>2x1</td>
-                            <td>Refrescos 600ml</td>
-                            <td>30/09/2023</td>
-                            <td><span class="status-badge active">Activa</span></td>
-                            <td>
-                                <button class="btn-edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-delete"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Descuento $50</td>
-                            <td>Fijo</td>
-                            <td>$50</td>
-                            <td>Compra mínima $300</td>
-                            <td>10/07/2023</td>
-                            <td><span class="status-badge expired">Expirada</span></td>
-                            <td>
-                                <button class="btn-edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-delete"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
                 </table>
             </div>
-
             <!-- Modal para agregar/editar promoción -->
-            <div id="promo-modal" class="modal">
+            <div id="promo-modal" class="modal" style="display: none;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 id="modal-title">Nueva Promoción</h3>
@@ -134,7 +99,7 @@
                                 <label for="promo-name">Nombre de la promoción*</label>
                                 <input type="text" id="promo-name" required>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="promo-type">Tipo de promoción*</label>
                                 <select id="promo-type" required>
@@ -145,19 +110,19 @@
                                     <option value="free_shipping">Envío gratis</option>
                                 </select>
                             </div>
-                            
+
                             <div class="form-group" id="discount-amount-group">
                                 <label for="discount-amount">Valor del descuento*</label>
                                 <input type="number" id="discount-amount" min="0">
                             </div>
-                            
-                            <div class="form-group" id="buyxgety-group" style="display:none;">
+
+                            <div class="form-group" id="buyxgety-group" style="display: none;">
                                 <label for="buy-quantity">Compra*</label>
                                 <input type="number" id="buy-quantity" min="1" placeholder="Cantidad X">
                                 <label for="get-quantity">Lleva*</label>
                                 <input type="number" id="get-quantity" min="1" placeholder="Cantidad Y">
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="promo-products">Aplicar a*</label>
                                 <select id="promo-products" required>
@@ -166,39 +131,58 @@
                                     <option value="products">Productos seleccionados</option>
                                 </select>
                             </div>
-                            
-                            <div class="form-group" id="category-group" style="display:none;">
+
+                            <div class="form-group" id="products-group" style="display: none;">
+                                <label for="product-search">Buscar productos*</label>
+                                <input type="text" id="product-search" placeholder="Escribe el nombre del producto">
+                                <div id="product-suggestions" class="suggestions-list"></div>
+
+                                <!-- Lista de productos seleccionados -->
+                                <div id="selected-products"></div>
+                            </div>
+
+
+                            <div class="form-group" id="category-group" style="display: none;">
                                 <label for="promo-category">Categoría</label>
                                 <select id="promo-category">
+                                    <option value="dulceria">Dulcería</option>
                                     <option value="bebidas">Bebidas</option>
-                                    <option value="snacks">Snacks</option>
+                                    <option value="panaderia">Panadería</option>
+                                    <option value="abarrotes">Abarrotes</option>
+                                    <option value="snacks">Cereales</option>
+                                    <option value="snacks">Botanas</option>
                                     <option value="limpieza">Limpieza</option>
+                                    <option value="snacks">Lacteos</option>                              
+                                    <option value="abarrotes">Enlatados</option>
                                 </select>
+
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="promo-start">Fecha inicio*</label>
                                 <input type="date" id="promo-start" required>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="promo-end">Fecha fin*</label>
                                 <input type="date" id="promo-end" required>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="promo-description">Descripción</label>
                                 <textarea id="promo-description" rows="3"></textarea>
                             </div>
-                            
+
                             <div class="form-actions">
                                 <button type="button" class="btn-cancel">Cancelar</button>
-                                <button type="submit" class="btn-save">Guardar Promoción</button>
+                                <button type="submit" class="btn-save">Guardar</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
+
+
         </main>
     </div>
 
@@ -206,4 +190,5 @@
     <script src="js/auth.js"></script>
     <script src="js/promociones.js"></script>
 </body>
+
 </html>

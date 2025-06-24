@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Punto de Venta - General</title>
-    <link rel="stylesheet" href="css/estilos.css">
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <link rel="stylesheet" href="css/estilos.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
+
 <body>
     <div class="dashboard-container">
         <aside class="sidebar">
             <div class="logo">
-                <img src="css/logo.png" alt="Logo Tienda">
+                <img src="css/logo.png" alt="Logo Tienda" />
                 <h2>Nuestra tienda</h2>
             </div>
             <nav class="menu">
@@ -20,12 +21,12 @@
                     <li class="active"><a href="index.html"><i class="icon fas fa-chart-line"></i>General</a></li>
                     <li><a href="inventario.html"><i class="icon fas fa-boxes"></i>Inventario</a></li>
                     <li><a href="reportes.html"><i class="icon fas fa-chart-pie"></i>Reportes</a></li>
-                    <li ><a href="promociones.html"><i class="icon fas fa-tag"></i>Promociones</a></li>
+                    <li><a href="promociones.html"><i class="icon fas fa-tag"></i>Promociones</a></li>
                     <li><a href="usuarios.html"><i class="icon fas fa-users"></i>Usuarios</a></li>
                 </ul>
             </nav>
             <div class="user-profile">
-                <img src="css/usuario.webp" alt="Usuario">
+                <img src="css/usuario.webp" alt="Usuario" />
                 <span></span>
                 <button id="logout-btn">Cerrar sesión</button>
             </div>
@@ -33,7 +34,7 @@
 
         <main class="main-content">
             <header class="header">
-                <h1>Buenas buenas:D</h1>
+                <h1 id="greeting">Bienvenido</h1>
                 <div class="date-time">
                     <span id="current-date"></span>
                     <span id="current-time"></span>
@@ -43,37 +44,28 @@
             <div class="cards-container">
                 <div class="card balance">
                     <h3>Balance del Día</h3>
-                    <div class="amount">$20,670 <span>MXN</span></div>
-                    <div class="info">
-                        <span>Ventas: 45</span>
-                        <span>Productos: 120</span>
-                    </div>
+                    <div class="amount"><span>...</span></div>
+                    <div class="info"></div>
                 </div>
 
                 <div class="card income">
                     <h3>Ingresos</h3>
-                    <div class="amount">$2,080 <span>MXN</span></div>
-                    <div class="info">
-                        <span>Efectivo: $1,400</span>
-                        <span>Tarjeta: $680</span>
-                    </div>
+                    <div class="amount"><span>...</span></div>
+                    <div class="info"></div>
                 </div>
 
-                <div class="card expenses">
-                    <h3>Gastos</h3>
-                    <div class="amount">$1,100 <span>MXN</span></div>
-                    <div class="info">
-                        <span>Proveedores: $800</span>
-                        <span>Otros: $300</span>
-                    </div>
+
+                <div class="card profit">
+                    <h3>Rentabilidad</h3>
+                    <div class="amount"><span>...</span></div>
+                    <div class="info"><span>Ingresos - Gastos</span></div>
                 </div>
 
                 <div class="card inventory-alerts">
                     <h3>Alertas de Inventario</h3>
-                    <div class="amount">5 <span>Productos</span></div>
+                    <div class="amount"> <span>Productos</span></div>
                     <div class="alert-items">
-                        <span>Refrescos (Stock: 3)</span>
-                        <span>Galletas (Stock: 2)</span>
+
                     </div>
                 </div>
             </div>
@@ -94,17 +86,105 @@
     <script src="js/main.js"></script>
     <script src="js/auth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
+        const rol = localStorage.getItem('rol');
+        console.log('Rol actual:', rol);
 
-const rol = localStorage.getItem('rol');
-console.log('Rol actual:', rol);
+        if (rol !== 'administrador' && window.location.pathname.includes('index.html')) {
+            window.location.href = 'login.html';
+        }
 
-if (rol !== 'administrador' && window.location.pathname.includes('index.html')) {
-    window.location.href = 'login.html';
-} else if (rol !== 'cajero' && window.location.pathname.includes('cajero.html')) {
-    window.location.href = 'login.html';
+        // Saludo según la hora
+        const saludo = document.getElementById("greeting");
+        const hour = new Date().getHours();
+        if (hour < 12) saludo.textContent = "¡Buenos días!";
+        else if (hour < 19) saludo.textContent = "¡Buenas tardes!";
+        else saludo.textContent = "¡Buenas noches!";
+
+        // Reloj
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('current-date').textContent = now.toLocaleDateString('es-MX', { dateStyle: 'full' });
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('es-MX');
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+
+        // Cargar datos del resumen del día
+       async function cargarResumenDelDia() {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('/api/ventas/dia', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (res.status === 401) throw new Error("No autorizado");
+
+    const data = await res.json(); // ✅ Aquí defines correctamente `data`
+    console.log("🧾 Resumen recibido:", data); // para depurar
+
+    // 1. Mostrar Alertas de inventario
+    const alertaCard = document.querySelector('.inventory-alerts');
+    const alertItemsContainer = document.querySelector('.inventory-alerts .alert-items');
+    const alertAmount = document.querySelector('.inventory-alerts .amount');
+
+    const productosBajoStock = data.productos_bajo_stock || [];
+
+    alertAmount.innerHTML = `${productosBajoStock.length} <span>Productos</span>`;
+    alertItemsContainer.innerHTML = productosBajoStock.map(p =>
+      `<span>${p.nombre} (Stock: ${p.stock})</span>`
+    ).join(' ');
+
+    if (productosBajoStock.length > 0) {
+      alertaCard.classList.add('alerta-parpadeo');
+    } else {
+      alertaCard.classList.remove('alerta-parpadeo');
+    }
+
+    // 2. Mostrar datos financieros
+    const totalVentas = Number(data.total_ventas) || 0;
+    const totalDia = Number(data.total_dia) || 0;
+    const efectivo = Number(data.efectivo) || 0;
+    const tarjeta = Number(data.tarjeta) || 0;
+    const ticketPromedio = Number(data.ticket_promedio) || 0;
+    const gastos = 1100;
+    const rentabilidad = totalDia - gastos;
+
+    const balanceAmount = document.querySelector('.balance .amount');
+    const balanceInfo = document.querySelector('.balance .info');
+    const incomeAmount = document.querySelector('.income .amount');
+    const incomeInfo = document.querySelector('.income .info');
+    const profitAmount = document.querySelector('.profit .amount');
+
+    if (balanceAmount && balanceInfo && incomeAmount && incomeInfo && profitAmount) {
+      balanceAmount.innerHTML = `$${totalDia.toFixed(2)} <span>MXN</span>`;
+      balanceInfo.innerHTML = `
+        <span>Ventas: ${totalVentas}</span>
+        <span>Ticket Promedio: $${ticketPromedio.toFixed(2)}</span>
+      `;
+
+      incomeAmount.innerHTML = ''; // ocultamos el número grande
+      incomeInfo.innerHTML = `
+        <div class="ingreso-item">Efectivo: $${efectivo.toFixed(2)}</div>
+        <div class="ingreso-item">Tarjeta: $${tarjeta.toFixed(2)}</div>
+      `;
+
+      profitAmount.innerHTML = `$${rentabilidad.toFixed(2)} <span>MXN</span>`;
+    } else {
+      console.error("Alguno de los elementos del DOM no se encontró");
+    }
+
+  } catch (err) {
+    console.error('Error cargando resumen del día:', err);
+  }
 }
-</script>
 
+
+        document.addEventListener('DOMContentLoaded', cargarResumenDelDia);
+    </script>
 </body>
+
 </html>

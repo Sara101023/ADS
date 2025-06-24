@@ -27,3 +27,10 @@ app.listen(port, () => {
   console.log(` Servidor backend escuchando en: http://localhost:${port}`);
   console.log(` Frontend disponible en: http://localhost:${port}/login.html`);
 });
+
+const productRoutes = require('./routes/product.routes');
+app.use(productRoutes);
+
+const promoRoutes = require('./routes/promotions.routes');
+app.use(promoRoutes);
+

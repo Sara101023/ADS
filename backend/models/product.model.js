@@ -12,7 +12,7 @@ class Product {
      * @returns {Promise<Array>} Lista de productos
      */
     static async getAll() {
-    const [rows] = await pool.query(`
+        const [rows] = await pool.query(`
         SELECT 
             id_producto,
             nombre,
@@ -27,8 +27,8 @@ class Product {
         FROM producto 
         WHERE estado = ?
     `, [PRODUCT_STATUS.ACTIVE]);
-    return rows;
-}
+        return rows;
+    }
 
     /**
      * Obtiene un producto por ID
@@ -36,14 +36,14 @@ class Product {
      * @returns {Promise<Object|null>} Producto encontrado o null
      */
     static async getById(id) {
-    const [rows] = await pool.query(`
+        const [rows] = await pool.query(`
         SELECT id_producto, nombre, descripcion, precio, stock, codigo_barras,
                id_proveedor, estado, fecha_desactivacion, categoria, tiene_iva
         FROM producto 
         WHERE id_producto = ?
     `, [id]);
-    return rows[0] || null;
-}
+        return rows[0] || null;
+    }
 
 
     /**
@@ -107,13 +107,15 @@ class Product {
     static async update(id, productData) {
         await pool.query(`
             UPDATE producto SET 
-                nombre = ?,
-                descripcion = ?,
-                precio = ?,
-                stock = ?,
-                codigo_barras = ?,
-                id_proveedor = ?
-            WHERE id_producto = ?
+    nombre = ?,
+    descripcion = ?,
+    precio = ?,
+    stock = ?,
+    codigo_barras = ?,
+    id_proveedor = ?,
+    estado = ?
+WHERE id_producto = ?
+
         `, [
             productData.nombre,
             productData.descripcion,
@@ -121,6 +123,7 @@ class Product {
             productData.stock,
             productData.codigo_barras,
             productData.id_proveedor,
+            productData.estado, // ← nuevo
             id
         ]);
     }

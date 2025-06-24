@@ -177,8 +177,9 @@ const inventoryController = {
 
 // Funciones auxiliares
 function isAdmin(user) {
-    return user.id_rol === 1; // 1 = administrador en tu base de datos
+    return user.nombre_rol === 'administrador';
 }
+
 
 async function getProductOrFail(id, res) {
     const product = await Product.getById(id);
@@ -211,13 +212,15 @@ function validateUpdatedFields({ precio, stock }) {
 
 function prepareUpdateData(newData, existingProduct) {
     return {
-        nombre: newData.nombre || existingProduct.nombre,
-        descripcion: newData.descripcion || existingProduct.descripcion,
-        precio: newData.precio || existingProduct.precio,
-        stock: newData.stock || existingProduct.stock,
-        codigo_barras: newData.codigo_barras || existingProduct.codigo_barras,
-        id_proveedor: newData.id_proveedor || existingProduct.id_proveedor
-    };
+    nombre: newData.nombre || existingProduct.nombre,
+    descripcion: newData.descripcion || existingProduct.descripcion,
+    precio: newData.precio || existingProduct.precio,
+    stock: newData.stock || existingProduct.stock,
+    codigo_barras: newData.codigo_barras || existingProduct.codigo_barras,
+    id_proveedor: newData.id_proveedor || existingProduct.id_proveedor,
+    estado: newData.estado || existingProduct.estado  // ← nuevo
+};
+
 }
 
 function handleServerError(res, logMessage, error) {

@@ -4,6 +4,7 @@ const Promotion = require('../models/promotion.model');
 const { generarTicketPDF } = require('../utils/ticketPDF');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
+const pool = require('../config/database');
 
 const salesController = {
     processSale: async (req, res) => {
@@ -12,7 +13,6 @@ const salesController = {
             const nombreCliente = cliente?.nombre || 'Invitado';
             const correoCliente = cliente?.correo || 'noreply@ventas.com';
 
-            // Validación inicial
             if (!items || !Array.isArray(items) || items.length === 0 || !metodo_pago) {
                 return res.status(400).json({ error: 'Items y método de pago son requeridos' });
             }
@@ -22,25 +22,22 @@ const salesController = {
                 return res.status(400).json({ error: 'Método de pago inválido' });
             }
 
-
-
             let subtotal = 0;
             let iva = 0;
             const processedItems = [];
 
             for (const item of items) {
                 const product = await Product.getById(item.id_producto);
-                console.log(`Producto: ${product.nombre}, tiene_iva: ${product.tiene_iva}`);
                 if (!product) {
                     return res.status(400).json({ error: `Producto con ID ${item.id_producto} no encontrado` });
                 }
 
-               if (product.stock < item.cantidad) {
-    return res.status(400).json({
-        error: 'no_stock',
-        producto: product.nombre
-    });
-}
+                if (product.stock < item.cantidad) {
+                    return res.status(400).json({
+                        error: 'no_stock',
+                        producto: product.nombre
+                    });
+                }
 
                 const promotions = await Promotion.getActivePromotionsForProduct(item.id_producto);
                 let discount = 0;
@@ -85,12 +82,10 @@ const salesController = {
                 total,
                 subtotal,
                 iva,
-                id_metodo_pago: metodoPagoId, // ✅ CORREGIDO
+                id_metodo_pago: metodoPagoId,
                 usuario_id: req.user?.id || null,
                 items: processedItems
             };
-
-            console.log('🧾 Venta lista para insertar:', saleData);
 
             const saleId = await Sale.create(saleData);
             const completeSale = await Sale.getById(saleId);
@@ -101,7 +96,7 @@ const salesController = {
                 subtotal,
                 iva,
                 total,
-                metodo_pago, // aquí puede mantenerse como texto para mostrar en el ticket
+                metodo_pago,
                 items: processedItems
             }, nombreCliente, (pdfPath) => {
                 if (!pdfPath || !fs.existsSync(pdfPath)) {
@@ -139,6 +134,7 @@ const salesController = {
                 message: 'Venta registrada exitosamente',
                 sale: completeSale
             });
+
         } catch (error) {
             console.error('❌ Error al procesar venta:', error);
             res.status(500).json({ error: 'Error en el servidor', detalle: error.message });
@@ -167,7 +163,40 @@ const salesController = {
             console.error('❌ Error al obtener venta:', error);
             res.status(500).json({ error: 'Error al obtener venta' });
         }
+    },
+
+    getResumenDelDia: async (req, res) => {
+    try {
+        // Obtener datos de ventas del día
+        const [rows] = await pool.query(`
+            SELECT 
+                COUNT(*) AS total_ventas,
+                SUM(total) AS total_dia,
+                SUM(CASE WHEN id_metodo_pago = 1 THEN total ELSE 0 END) AS efectivo,
+                SUM(CASE WHEN id_metodo_pago = 2 THEN total ELSE 0 END) AS tarjeta,
+                AVG(total) AS ticket_promedio
+            FROM venta
+            WHERE DATE(fecha) = CURDATE()
+        `);
+
+        // Obtener productos con bajo stock
+        const productos_bajo_stock = await Product.getLowStock();
+
+        // Respuesta final
+        res.json({
+            total_ventas: rows[0].total_ventas || 0,
+            total_dia: rows[0].total_dia || 0,
+            efectivo: rows[0].efectivo || 0,
+            tarjeta: rows[0].tarjeta || 0,
+            ticket_promedio: rows[0].ticket_promedio || 0,
+            productos_bajo_stock
+        });
+    } catch (error) {
+        console.error('❌ Error al obtener resumen del día:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
+}
+
 };
 
 module.exports = salesController;
