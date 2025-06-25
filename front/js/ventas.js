@@ -492,3 +492,28 @@ function confirmarClearCart() {
     cerrarClearCartModal();
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  const returnBtn = document.getElementById('returnBtn');
+  const returnModal = document.getElementById('returnModal');
+  const closeBtn = document.getElementById('closeReturnModal');
+  const cancelBtn = document.getElementById('cancelDevolucion');
+
+  if (returnBtn) {
+    returnBtn.addEventListener('click', () => {
+      returnModal.style.display = 'flex';
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      returnModal.style.display = 'none';
+    });
+  }
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      returnModal.style.display = 'none';
+    });
+  }
+});
+

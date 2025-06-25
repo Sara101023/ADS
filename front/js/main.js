@@ -38,4 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = 'login.html';
     });
   }
+
+  // ✅ Mostrar botón "Devoluciones" solo si es cajero
+  const returnBtn = document.getElementById('returnBtn');
+  if (returnBtn && (!user || user.id_rol !== 2)) {
+    returnBtn.style.display = 'none';
+  }
+
+  
 });
