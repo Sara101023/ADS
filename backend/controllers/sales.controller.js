@@ -38,11 +38,12 @@ const salesController = {
                         producto: product.nombre
                     });
                 }
-
-                const promotions = await Promotion.getActivePromotionsForProduct(item.id_producto);
+                
+                const promotions = await Promotion.getActivePromotionsForProduct(product);
                 let discount = 0;
                 let finalPrice = product.precio;
                 let finalQuantity = item.cantidad;
+
 
                 if (promotions.length > 0) {
                     for (const promo of promotions) {
@@ -53,6 +54,7 @@ const salesController = {
                         } else if (promo.tipo_promocion === '3x2' && item.cantidad >= 3) {
                             const groups = Math.floor(item.cantidad / 3);
                             discount += product.precio * groups;
+                            console.log("Promo Nx$ aplicada:", promo);
                         } else if (promo.tipo_promocion === 'Nx$' && item.cantidad >= promo.cantidad_minima) {
                             const groups = Math.floor(item.cantidad / promo.cantidad_minima);
                             discount += (product.precio * promo.cantidad_minima - promo.precio_promocional) * groups;
@@ -60,7 +62,7 @@ const salesController = {
                     }
                 }
 
-                const itemSubtotal = finalPrice * finalQuantity;
+                const itemSubtotal = (finalPrice * finalQuantity) - discount;
                 const itemIva = product.tiene_iva ? product.precio * item.cantidad * 0.16 : 0;
 
                 subtotal += itemSubtotal;

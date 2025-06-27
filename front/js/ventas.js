@@ -1,3 +1,4 @@
+let promocionesActivas = [];
 let products = [];
 let cart = [];
 let currentCategory = 'Todos';
@@ -5,7 +6,9 @@ const urlParams = new URLSearchParams(window.location.search);
 const isGuest = urlParams.get('guest') === 'true';
 const user = JSON.parse(localStorage.getItem('currentUser'));
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
+
+    await cargarPromocionesActivas(); 
     checkAuth();
     setupGuestMode();
     loadProducts();
@@ -72,6 +75,17 @@ async function loadProducts() {
         alert('Error al cargar productos');
     }
 }
+
+async function cargarPromocionesActivas() {
+    try {
+        const res = await fetch('http://localhost:4000/api/promociones/activas');
+        promocionesActivas = await res.json();
+        console.log('🎯 Promociones activas:', promocionesActivas);
+    } catch (err) {
+        console.error('❌ Error al cargar promociones activas:', err);
+    }
+}
+
 
 function renderProducts() {
     const grid = document.getElementById('productsGrid');
@@ -142,11 +156,19 @@ function addToCart(productId) {
         return;
     }
 
+        const promo = promocionesActivas.find(p => 
+        p.id_producto === productId ||
+        (p.aplicacion === 'categoria' && p.categoria === product.categoria) ||
+        p.aplicacion === 'global'
+    );
+
     // Agregar o aumentar cantidad
     if (item) {
         item.cantidad += 1;
     } else {
-        cart.push({ ...product, cantidad: 1 });
+        cart.push({ ...product, cantidad: 1, tipo_promocion: promo?.tipo || null,
+            cantidad_minima: promo?.cantidad_minima || null,
+            precio_promocional: promo?.precio_promocional || null });
     }
 
     saveCart();
@@ -222,16 +244,44 @@ function decreaseQuantity(id) {
     }
 }
 
+function calcularDescuentoPorPromocion(item) {
+    const cantidad = item.cantidad;
+    const precio = item.precio;
+    const tipo = item.tipo_promocion || null;
+    const cantidadMin = item.cantidad_minima || 0;
+    const precioPromo = item.precio_promocional || 0;
+
+    if (!tipo || cantidad < 1) return 0;
+
+    if (tipo === '3x1' && cantidad >= 3) {
+        const grupos = Math.floor(cantidad / 3);
+        return (precio * 2) * grupos;
+    } else if (tipo === '3x2' && cantidad >= 3) {
+        const grupos = Math.floor(cantidad / 3);
+        return precio * grupos;
+    } else if (tipo === 'Nx$' && cantidad >= cantidadMin) {
+        const grupos = Math.floor(cantidad / cantidadMin);
+        return (precio * cantidadMin - precioPromo) * grupos;
+    }
+
+    return 0;
+}
+
+
 function updateTotals() {
     let subtotal = 0;
-    let itemsSummary = "";
+    let totalDescuento = 0;
+
     cart.forEach(item => {
-        const itemTotal = item.precio * item.cantidad;
+        const descuento = calcularDescuentoPorPromocion(item);
+        const itemTotal = (item.precio * item.cantidad) - descuento;
         subtotal += itemTotal;
-        itemsSummary += `${item.nombre} x ${item.cantidad} = $${itemTotal.toFixed(2)}\n`;
+        totalDescuento += descuento;
     });
+
     const iva = subtotal * 0.16;
     const total = subtotal + iva;
+
     if (document.getElementById('subtotal')) {
         document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
     }
@@ -241,7 +291,18 @@ function updateTotals() {
     if (document.getElementById('total')) {
         document.getElementById('total').textContent = `$${total.toFixed(2)}`;
     }
+
+    // Mostrar el total ahorrado (opcional)
+    if (!document.getElementById('descuentoTotal')) {
+        const div = document.createElement('div');
+        div.className = 'cart-total-row';
+        div.innerHTML = `<span>Descuento aplicado:</span><span id="descuentoTotal">$0.00</span>`;
+        document.querySelector('.cart-totals').prepend(div);
+    }
+
+    document.getElementById('descuentoTotal').textContent = `-$${totalDescuento.toFixed(2)}`;
 }
+
 
 function clearCart() {
     cart = [];

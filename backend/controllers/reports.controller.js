@@ -196,4 +196,218 @@ const salesController = {
     }
 };
 
-module.exports = salesController;
+const pool = require('../config/database'); // o tu conexión MySQL
+const reportsController = {};
+
+reportsController.getSalesReport = async (req, res) => {
+    const { startDate, endDate, paymentMethod, category } = req.query;
+
+    try {
+        let query = `
+            SELECT 
+                v.id_venta AS folio,
+                DATE_FORMAT(v.fecha, '%d/%m/%Y %H:%i') AS fecha,
+                GROUP_CONCAT(p.nombre SEPARATOR ', ') AS productos,
+                GROUP_CONCAT(dv.cantidad SEPARATOR ', ') AS cantidades,
+                GROUP_CONCAT(dv.precio_unitario SEPARATOR ', ') AS precios,
+                v.subtotal, v.iva, v.total,
+                mp.tipo_pago AS metodo_pago,
+                0 AS descuento, -- Aquí puedes sumar si guardas descuentos
+                GROUP_CONCAT(p.categoria SEPARATOR ', ') AS categorias
+            FROM venta v
+            JOIN detalle_venta dv ON v.id_venta = dv.id_venta
+            JOIN producto p ON dv.id_producto = p.id_producto
+            LEFT JOIN metodo_pago mp ON v.id_metodo_pago = mp.id_metodo_pago
+            WHERE 1 = 1
+        `;
+
+        const params = [];
+
+        if (startDate) {
+            query += " AND v.fecha >= STR_TO_DATE(?, '%d/%m/%Y')";
+            params.push(startDate);
+        }
+        if (endDate) {
+            query += " AND v.fecha <= STR_TO_DATE(?, '%d/%m/%Y')";
+            params.push(endDate);
+        }
+        if (paymentMethod && paymentMethod !== 'all') {
+            query += " AND mp.tipo_pago = ?";
+            params.push(paymentMethod);
+        }
+        if (category && category !== 'all') {
+            query += " AND p.categoria = ?";
+            params.push(category);
+        }
+
+        query += " GROUP BY v.id_venta ORDER BY v.fecha DESC";
+
+        const [rows] = await pool.query(query, params);
+        res.json(rows);
+
+    } catch (err) {
+        console.error('Error al obtener el reporte de ventas:', err);
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+};
+
+const { Parser } = require('json2csv');
+
+reportsController.exportSalesCSV = async (req, res) => {
+    const { startDate, endDate, paymentMethod, category } = req.query;
+
+    try {
+        let query = `
+            SELECT 
+                v.id_venta AS folio,
+                DATE_FORMAT(v.fecha, '%d/%m/%Y %H:%i') AS fecha,
+                GROUP_CONCAT(p.nombre SEPARATOR ', ') AS productos,
+                GROUP_CONCAT(dv.cantidad SEPARATOR ', ') AS cantidades,
+                GROUP_CONCAT(dv.precio_unitario SEPARATOR ', ') AS precios,
+                v.subtotal, v.iva, v.total,
+                mp.tipo_pago AS metodo_pago,
+                0 AS descuento,
+                GROUP_CONCAT(p.categoria SEPARATOR ', ') AS categorias
+            FROM venta v
+            JOIN detalle_venta dv ON v.id_venta = dv.id_venta
+            JOIN producto p ON dv.id_producto = p.id_producto
+            LEFT JOIN metodo_pago mp ON v.id_metodo_pago = mp.id_metodo_pago
+            WHERE 1 = 1
+        `;
+
+        const params = [];
+
+        if (startDate) {
+            query += " AND v.fecha >= STR_TO_DATE(?, '%d/%m/%Y')";
+            params.push(startDate);
+        }
+        if (endDate) {
+            query += " AND v.fecha <= STR_TO_DATE(?, '%d/%m/%Y')";
+            params.push(endDate);
+        }
+        if (paymentMethod && paymentMethod !== 'all') {
+            query += " AND mp.tipo_pago = ?";
+            params.push(paymentMethod);
+        }
+        if (category && category !== 'all') {
+            query += " AND p.categoria = ?";
+            params.push(category);
+        }
+
+        query += " GROUP BY v.id_venta ORDER BY v.fecha DESC";
+
+        const [rows] = await pool.query(query, params);
+
+        const fields = ['folio', 'fecha', 'productos', 'cantidades', 'precios', 'subtotal', 'iva', 'total', 'metodo_pago', 'descuento', 'categorias'];
+        const parser = new Parser({ fields });
+        const csv = parser.parse(rows);
+
+        res.header('Content-Type', 'text/csv');
+        res.attachment('reporte_ventas.csv');
+        res.send(csv);
+
+    } catch (err) {
+        console.error('Error al exportar CSV:', err);
+        res.status(500).json({ error: 'Error al generar el CSV' });
+    }
+};
+
+const PDFDocument = require('pdfkit');
+const moment = require('moment');
+
+reportsController.exportSalesPDF = async (req, res) => {
+    const { startDate, endDate, paymentMethod, category } = req.query;
+
+    try {
+        let query = `
+            SELECT 
+                v.id_venta AS folio,
+                DATE_FORMAT(v.fecha, '%d/%m/%Y %H:%i') AS fecha,
+                GROUP_CONCAT(p.nombre SEPARATOR ', ') AS productos,
+                GROUP_CONCAT(dv.cantidad SEPARATOR ', ') AS cantidades,
+                GROUP_CONCAT(dv.precio_unitario SEPARATOR ', ') AS precios,
+                v.subtotal, v.iva, v.total,
+                mp.tipo_pago AS metodo_pago,
+                0 AS descuento,
+                GROUP_CONCAT(p.categoria SEPARATOR ', ') AS categorias
+            FROM venta v
+            JOIN detalle_venta dv ON v.id_venta = dv.id_venta
+            JOIN producto p ON dv.id_producto = p.id_producto
+            LEFT JOIN metodo_pago mp ON v.id_metodo_pago = mp.id_metodo_pago
+            WHERE 1 = 1
+        `;
+
+        const params = [];
+
+        if (startDate) {
+            query += " AND v.fecha >= STR_TO_DATE(?, '%d/%m/%Y')";
+            params.push(startDate);
+        }
+        if (endDate) {
+            query += " AND v.fecha <= STR_TO_DATE(?, '%d/%m/%Y')";
+            params.push(endDate);
+        }
+        if (paymentMethod && paymentMethod !== 'all') {
+            query += " AND mp.tipo_pago = ?";
+            params.push(paymentMethod);
+        }
+        if (category && category !== 'all') {
+            query += " AND p.categoria = ?";
+            params.push(category);
+        }
+
+        query += " GROUP BY v.id_venta ORDER BY v.fecha DESC";
+
+        const [rows] = await pool.query(query, params);
+
+        // Crear PDF
+        const doc = new PDFDocument({ margin: 30, size: 'A4' });
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=reporte_ventas.pdf');
+        doc.pipe(res);
+
+        doc.fontSize(18).text('Reporte de Ventas', { align: 'center' });
+        doc.moveDown();
+
+        doc.fontSize(10).text(`Generado: ${moment().format('DD/MM/YYYY HH:mm')}`);
+        doc.moveDown();
+
+        rows.forEach(row => {
+            doc.fontSize(12).text(`Folio: ${row.folio}`);
+            doc.text(`Fecha: ${row.fecha}`);
+            doc.text(`Productos: ${row.productos}`);
+            doc.text(`Cantidades: ${row.cantidades}`);
+            doc.text(`Precios: ${row.precios}`);
+            doc.text(`Subtotal: $${row.subtotal}`);
+            doc.text(`IVA: $${row.iva}`);
+            doc.text(`Total: $${row.total}`);
+            doc.text(`Método de pago: ${row.metodo_pago}`);
+            doc.text(`Descuento: $${row.descuento}`);
+            doc.text(`Categorías: ${row.categorias}`);
+            doc.moveDown();
+            doc.moveDown();
+        });
+
+        doc.end();
+
+    } catch (err) {
+        console.error('Error al exportar PDF:', err);
+        res.status(500).json({ error: 'Error al generar el PDF' });
+    }
+};
+
+reportsController.getMostSoldProducts = async (req, res) => {
+    res.json([]); // o tu lógica real
+};
+
+reportsController.getPaymentMethodsReport = async (req, res) => {
+    res.json([]); // o tu lógica real
+};
+
+
+
+
+module.exports = {   
+    reportsController,
+    salesController
+};

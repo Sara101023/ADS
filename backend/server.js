@@ -28,6 +28,10 @@ app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/usuarios', require('./routes/user.routes'));
 app.use('/api/inventory', require('./routes/inventory.routes'));
 app.use('/api/ventas', require('./routes/sales.routes'));
+app.use('/api/promociones', require('./routes/promotions.routes'));
+app.use('/api/reports', require('./routes/reports.routes'));
+
+
 
 // LOGS DE PETICIONES
 app.use((req, res, next) => {

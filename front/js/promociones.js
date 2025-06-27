@@ -52,41 +52,88 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Enviar formulario
   const promoForm = document.getElementById('promo-form');
-
-  promoForm.addEventListener('submit', async function(e) {
+  promoForm.addEventListener('submit', async function (e) {
   e.preventDefault();
 
-  const data = {
-    nombre: document.getElementById('promo-name').value,
-    tipo: document.getElementById('promo-type').value,
-    descuento: document.getElementById('discount-amount').value || null,
-    buyX: document.getElementById('buy-quantity')?.value || null,
-    getY: document.getElementById('get-quantity')?.value || null,
-    aplicacion: document.getElementById('promo-products').value,
-    categoria: document.getElementById('promo-category')?.value || null,
-    fecha_inicio: document.getElementById('promo-start').value,
-    fecha_fin: document.getElementById('promo-end').value,
-    descripcion: document.getElementById('promo-description').value
-  };
+  const tipoSeleccionado = document.getElementById('promo-type').value;
+  const aplicacion = document.getElementById('promo-products').value;
+  const promoType = document.getElementById('promo-type').value;
+  const categoria = document.getElementById('promo-category')?.value;
 
+if (aplicacion === 'category' && (!categoria || categoria === '')) {
+  alert('❌ Debes seleccionar una categoría válida.');
+  return;
+}
+
+  
+  const data = {
+  nombre: document.getElementById('promo-name').value,
+  aplicacion: aplicacion === 'all' ? 'global' : (aplicacion === 'products' ? 'producto' : 'categoria'),
+  fecha_inicio: document.getElementById('promo-start').value,
+  fecha_fin: document.getElementById('promo-end').value,
+  descripcion: document.getElementById('promo-description').value,
+};
+
+if (aplicacion === 'category') {
+  data.categoria = categoria;
+}
+
+  // 🔐 Validar tipo de promoción
+  if (tipoSeleccionado !== 'buyxgety') {
+    alert("❌ Solo se permiten promociones tipo 3x1, 3x2 o Nx$.");
+    return;
+  }
+
+  const buyX = document.getElementById('buy-quantity').value;
+  const getY = document.getElementById('get-quantity').value;
+
+  if (!buyX || !getY || parseInt(buyX) < 1 || parseInt(getY) < 1) {
+    alert("⚠️ Debes especificar cantidades válidas para 'Compra X' y 'Lleva Y'");
+    return;
+  }
+
+  data.buyX = buyX;
+  data.getY = getY;
+
+  // Traducir a tipo_promocion válido
+  if (buyX === '3' && getY === '1') {
+    data.tipo_promocion = '3x1';
+  } else if (buyX === '3' && getY === '2') {
+    data.tipo_promocion = '3x2';
+  } else {
+    data.tipo_promocion = 'Nx$';
+    const precioPromo = prompt("💰 Ingresa el precio promocional para esta oferta:");
+    if (!precioPromo || isNaN(precioPromo)) {
+      alert("❌ Debes ingresar un precio válido para la promoción Nx$");
+      return;
+    }
+    data.precio_promocional = parseFloat(precioPromo);
+    data.cantidad_minima = parseInt(buyX);
+  }
+
+  // Enviar al backend
   try {
     const res = await fetch('/api/promociones', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(data)
     });
 
-    if (!res.ok) throw new Error('Error al guardar promoción');
-
-    alert('Promoción guardada correctamente');
-    modal.style.display = 'none';
-    promoForm.reset();
-    cargarPromociones(); // recarga la tabla
-  } catch (error) {
-    alert('Hubo un problema: ' + error.message);
+    if (res.ok) {
+      alert('✅ Promoción guardada correctamente');
+      promoForm.reset();
+      cargarPromociones();
+    } else {
+      const error = await res.json();
+      alert('❌ Hubo un problema: ' + error.error);
+    }
+  } catch (err) {
+    console.error('❌ Error al guardar promoción:', err);
+    alert('Error al conectar con el servidor.');
   }
 });
-
 
   // Botones de editar
   const editButtons = document.querySelectorAll('.btn-edit');

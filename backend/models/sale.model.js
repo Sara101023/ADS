@@ -18,7 +18,7 @@ class Sale {
             // Insertar los detalles y actualizar el stock
             for (const item of items) {
                 await conn.query(
-                    'INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)',
+                    'INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio_unitario, descuento) VALUES (?, ?, ?, ?,?)',
                     [saleId, item.producto_id, item.cantidad, item.precio_unitario, item.descuento]
                 );
 
