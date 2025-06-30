@@ -240,8 +240,8 @@ function setupEventListeners() {
     }
 });
 
-    document.getElementById('searchByName').addEventListener('input', filterAndRenderInventory);
-document.getElementById('searchByCategory').addEventListener('input', filterAndRenderInventory);
+    document.getElementById('searchName').addEventListener('input', aplicarFiltros);
+document.getElementById('searchCategory').addEventListener('input', aplicarFiltros);
 
 }
 
