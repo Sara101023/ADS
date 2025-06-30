@@ -44,23 +44,37 @@ const salesController = {
                 let finalPrice = product.precio;
                 let finalQuantity = item.cantidad;
 
-
                 if (promotions.length > 0) {
-                    for (const promo of promotions) {
-                        if (promo.tipo_promocion === '3x1' && item.cantidad >= 3) {
-                            const groups = Math.floor(item.cantidad / 3);
-                            discount += (product.precio * 2) * groups;
-                            finalQuantity = item.cantidad - groups;
-                        } else if (promo.tipo_promocion === '3x2' && item.cantidad >= 3) {
-                            const groups = Math.floor(item.cantidad / 3);
-                            discount += product.precio * groups;
-                            console.log("Promo Nx$ aplicada:", promo);
-                        } else if (promo.tipo_promocion === 'Nx$' && item.cantidad >= promo.cantidad_minima) {
-                            const groups = Math.floor(item.cantidad / promo.cantidad_minima);
-                            discount += (product.precio * promo.cantidad_minima - promo.precio_promocional) * groups;
-                        }
-                    }
-                }
+  for (const promo of promotions) {
+    if (promo.tipo_promocion === '3x1' && item.cantidad >= 3) {
+      const groups = Math.floor(item.cantidad / 3);
+      discount += product.precio * 2 * groups; // pagas 1 de cada 3
+      finalQuantity = item.cantidad - groups * 2;
+    }
+
+    else if (promo.tipo_promocion === '3x2' && item.cantidad >= 3) {
+      const groups = Math.floor(item.cantidad / 3);
+      discount += product.precio * groups; // 1 gratis de cada 3
+      finalQuantity = item.cantidad;
+    }
+
+    else if (
+      promo.tipo_promocion === 'Nx$' &&
+      promo.cantidad_minima != null &&
+      promo.precio_promocional != null &&
+      item.cantidad >= promo.cantidad_minima
+    ) {
+      const groups = Math.floor(item.cantidad / promo.cantidad_minima);
+      const descuentoGrupo = (product.precio * promo.cantidad_minima) - promo.precio_promocional;
+      discount += descuentoGrupo * groups;
+      finalQuantity = item.cantidad;
+    }
+  }
+}
+
+
+
+            
 
                 const itemSubtotal = (finalPrice * finalQuantity) - discount;
                 const itemIva = product.tiene_iva ? product.precio * item.cantidad * 0.16 : 0;

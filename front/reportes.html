@@ -10,7 +10,39 @@
 <style>
      /* Estilos para la vista de reportes */
 
+  .table-container {
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .data-table {
+    min-width: 1000px;
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .data-table th, .data-table td {
+     padding: 8px 12px;
+     text-align: left;
+     white-space: normal;          /* ✅ Permite saltos de línea */
+    word-break: break-word;       /* ✅ Rompe palabras largas */
+    overflow-wrap: break-word;    /* ✅ Permite dividir contenido sin romper diseño */
+    vertical-align: top; 
+  }
+
 /* Filtros de reportes */
+.table-container {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.data-table {
+    min-width: 1000px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
 .report-filters {
     background-color: white;
     border-radius: 8px;
@@ -259,14 +291,14 @@
                 </div>
             </header>
 
-            <div class="report-filters">
+            <div id="filtros-ventas">
                 <div class="filter-section">
                     <h3>Tipo de Reporte</h3>
+                    
                     <div class="filter-group">
                         <select id="report-type" class="form-control">
-                            <option value="sales">Reporte de Ventas</option>
-                            <option value="inventory">Reporte de Inventario</option>
-                            <option value="performance">Reporte de Rendimiento</option>
+                            <option value="ventas">Reporte de Ventas</option>
+                            <option value="inventario">Reporte de Inventario</option>
                         </select>
                     </div>
                 </div>
@@ -294,37 +326,37 @@
                 <div class="filter-section">
                     <h3>Filtros Adicionales</h3>
                     <div class="additional-filters">
+
                         <div class="filter-group">
-                            <label for="branch-filter">Sucursal:</label>
-                            <select id="branch-filter" class="form-control">
-                                <option value="all">Todas</option>
-                                <option value="branch1">Sucursal Centro</option>
-                                <option value="branch2">Sucursal Norte</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label for="seller-filter">Vendedor:</label>
-                            <select id="seller-filter" class="form-control">
+
+                            <label for="provider-filter">Proveedor:</label>
+                            <select id="provider-filter" class="form-control">
                                 <option value="all">Todos</option>
-                                <option value="seller1">Juan Pérez</option>
-                                <option value="seller2">María Gómez</option>
                             </select>
                         </div>
+                      
                         <div class="filter-group">
                             <label for="category-filter">Categoría:</label>
                             <select id="category-filter" class="form-control">
                                 <option value="all">Todas</option>
-                                <option value="beverages">Bebidas</option>
-                                <option value="snacks">Botanas</option>
-                                <option value="cleaning">Limpieza</option>
+                                <option value="Bebidas">Bebidas</option>
+                                <option value="Botanas">Botanas</option>
+                                <option value="Limpieza">Limpieza</option>
+                                <option value="Panadería">Panadería</option>
+                                <option value="Lácteos">Lácteos</option>
+                                <option value="Enlatados">Enlatados</option>
+                                <option value="Dulces">Dulces</option>
+                                <option value="Abarrotes">Abarrotes</option>
+                                <option value="Cereales">Cereales</option>
+                                <option value="Carnes">Carnes</option>  
                             </select>
                         </div>
                         <div class="filter-group">
                             <label for="payment-filter">Método de pago:</label>
                             <select id="payment-filter" class="form-control">
                                 <option value="all">Todos</option>
-                                <option value="cash">Efectivo</option>
-                                <option value="card">Tarjeta</option>
+                                <option value="efectivo">Efectivo</option>
+                                <option value="tarjeta">Tarjeta</option>
                                 </select>
                         </div>
                     </div>
@@ -340,42 +372,70 @@
                 </div>
             </div>
 
+            <div id="tabla-inventario" style="display: none;">
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Categoría</th>
+          <th>Stock</th>
+          <th>Precio</th>
+          <th>Proveedor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Aquí se insertarán los datos dinámicamente -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+               
+        
+
             <div class="report-results">
                 <div class="report-summary">
+
+                   <!-- Ventas Totales -->
                     <div class="summary-card">
                         <h4>Ventas Totales</h4>
-                        <div class="summary-value">$24,580.50 <span>MXN</span></div>
+                        <div class="summary-value"><span>MXN</span></div>
                         <div class="summary-detail">
-                            <span>Subtotal: $20,150.00</span>
-                            <span>IVA: $4,430.50</span>
+                            <span>Subtotal: <span id="resumen-subtotal">$0.00</span></span>
+                            <span>IVA: <span id="resumen-iva">$0.00</span></span>
                         </div>
                     </div>
+
+                  <!-- Transacciones -->
                     <div class="summary-card">
                         <h4>Transacciones</h4>
-                        <div class="summary-value">128 <span>ventas</span></div>
-                        <div class="summary-detail">
-                            <span>Efectivo: 85</span>
-                            <span>Tarjeta: 43</span>
+                         <div class="summary-value"><span id="resumen-transacciones">0</span> <span>ventas</span></div>
+                         <div class="summary-detail" id="resumen-metodos">
+                         <!-- Aquí se insertarán Efectivo: X, Tarjeta: Y -->
                         </div>
                     </div>
+
+                         
+
+                  <!-- Productos Vendidos -->
                     <div class="summary-card">
-                        <h4>Productos Vendidos</h4>
-                        <div class="summary-value">542 <span>unidades</span></div>
-                        <div class="summary-detail">
-                            <span>Bebidas: 320</span>
-                            <span>Botanas: 222</span>
+                     <h4>Productos Vendidos</h4>
+                        <div class="summary-value"><span id="resumen-unidades">0</span> <span>unidades</span></div>
+                         <div class="summary-detail" id="resumen-categorias">
+                        <!-- Aquí se insertarán categorías dinámicamente -->
                         </div>
                     </div>
                 </div>
 
-                <div class="report-tabs">
-                    <div class="tabs-header">
-                        <button class="tab-btn active" data-tab="sales-data">Datos de Ventas</button>
+
+
+
+                 <button class="tab-btn active" data-tab="sales-data">Datos de Ventas</button>
                         <button class="tab-btn" data-tab="top-products">Productos Más Vendidos</button>
                         <button class="tab-btn" data-tab="payment-methods">Métodos de Pago</button>
                         <button class="tab-btn" data-tab="comparison">Comparativa</button>
                     </div>
-                    <div class="tabs-content">
                         <div id="sales-data" class="tab-pane active">
                             <div class="table-container">
                                 <table class="data-table">
@@ -394,21 +454,7 @@
                                             <th>Categoría</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <!-- Datos de ejemplo -->
-                                        <tr>
-                                            <td>V-0001</td>
-                                            <td>15/06/2023 10:30</td>
-                                            <td>Refresco 600ml, Galletas</td>
-                                            <td>2, 1</td>
-                                            <td>$18.00, $12.00</td>
-                                            <td>$48.00</td>
-                                            <td>$9.60</td>
-                                            <td>$57.60</td>
-                                            <td>Efectivo</td>
-                                            <td>$2.40</td>
-                                            <td>Bebidas, Botanas</td>
-                                        </tr>
+                                    <tbody>                                   
                                         <!-- Más filas se generarán dinámicamente -->
                                     </tbody>
                                 </table>
@@ -429,12 +475,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>Refresco 600ml</td>
-                                            <td>Bebidas</td>
-                                            <td>150</td>
-                                            <td>$2,700.00</td>
-                                        </tr>
+                                    
                                         <!-- Más filas se generarán dinámicamente -->
                                     </tbody>
                                 </table>
@@ -450,8 +491,10 @@
                                 <canvas id="comparisonChart"></canvas>
                             </div>
                         </div>
-                    </div>
                 </div>
+
+
+             
             </div>
         </main>
     </div>
@@ -464,3 +507,4 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 </body>
 </html>
+

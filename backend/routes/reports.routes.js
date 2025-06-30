@@ -9,5 +9,8 @@ router.get('/products/most-sold', authMiddleware.verifyToken, authMiddleware.che
 router.get('/payment-methods', authMiddleware.verifyToken, authMiddleware.checkAdmin, reportsController.getPaymentMethodsReport);
 router.get('/sales/export', authMiddleware.verifyToken, authMiddleware.checkAdmin, reportsController.exportSalesCSV);
 router.get('/sales/pdf', authMiddleware.verifyToken, authMiddleware.checkAdmin, reportsController.exportSalesPDF);
+router.get('/proveedores', authMiddleware.verifyToken, authMiddleware.checkAdmin, reportsController.getProveedores);
+router.get('/dashboard/resumen', authMiddleware.verifyToken, authMiddleware.checkAdmin, reportsController.getDashboardResumen);
+router.get('/inventory', authMiddleware.verifyToken, authMiddleware.checkAdmin, reportsController.getInventoryReport);
 
 module.exports = router;

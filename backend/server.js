@@ -5,6 +5,7 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const PDFDocument = require('pdfkit');
 const moment = require('moment');
+const productRoutes = require('./routes/product.routes');
 
 const app = express();
 const port = 4000;
@@ -30,6 +31,7 @@ app.use('/api/inventory', require('./routes/inventory.routes'));
 app.use('/api/ventas', require('./routes/sales.routes'));
 app.use('/api/promociones', require('./routes/promotions.routes'));
 app.use('/api/reports', require('./routes/reports.routes'));
+app.use('/api/productos', productRoutes);
 
 
 

@@ -3,7 +3,7 @@ const router = express.Router();
 const pool = require('../config/database');
 
 // Ruta para búsqueda de productos por nombre
-router.get('/api/productos', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const search = req.query.search || '';
     const [productos] = await pool.query(

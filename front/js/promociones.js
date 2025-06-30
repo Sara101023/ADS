@@ -92,6 +92,15 @@ if (aplicacion === 'category') {
     return;
   }
 
+  if (aplicacion === 'products') {
+  if (selectedProductIds.length === 0) {
+    alert("❌ Debes seleccionar al menos un producto.");
+    return;
+  }
+  data.productos = selectedProductIds;
+}
+
+
   data.buyX = buyX;
   data.getY = getY;
 
@@ -179,13 +188,20 @@ productSearch.addEventListener('input', function () {
   }
 
   fetch(`/api/productos?search=${encodeURIComponent(query)}`)
-    .then(res => res.json())
+    .then(async res => {
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text);
+  }
+  return res.json();
+})
+
     .then(productos => {
       productSuggestions.innerHTML = '';
       productos.forEach(p => {
         const div = document.createElement('div');
         div.textContent = p.nombre;
-        div.dataset.id = p._id;
+        div.dataset.id = p.id_producto;
         productSuggestions.appendChild(div);
       });
     });

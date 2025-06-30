@@ -84,6 +84,9 @@ async function cargarPromocionesActivas() {
     } catch (err) {
         console.error('❌ Error al cargar promociones activas:', err);
     }
+
+    console.table(promocionesActivas.filter(p => p.aplicacion === 'producto'));// momentaneo 
+
 }
 
 
@@ -156,20 +159,25 @@ function addToCart(productId) {
         return;
     }
 
-        const promo = promocionesActivas.find(p => 
-        p.id_producto === productId ||
-        (p.aplicacion === 'categoria' && p.categoria === product.categoria) ||
-        p.aplicacion === 'global'
+    const promo = promocionesActivas.find(p =>
+    (p.aplicacion === 'producto' && Number(p.id_producto) === Number(productId)) ||
+    (p.aplicacion === 'categoria' && p.categoria === product.categoria) ||
+    p.aplicacion === 'global'
     );
 
     // Agregar o aumentar cantidad
     if (item) {
-        item.cantidad += 1;
+    item.cantidad += 1;
     } else {
-        cart.push({ ...product, cantidad: 1, tipo_promocion: promo?.tipo || null,
-            cantidad_minima: promo?.cantidad_minima || null,
-            precio_promocional: promo?.precio_promocional || null });
-    }
+    cart.push({
+        ...product,
+        cantidad: 1,
+        tipo_promocion: promo?.tipo_promocion || promo?.tipo || null,
+        cantidad_minima: promo?.cantidad_minima || null,
+        precio_promocional: promo?.precio_promocional || null
+    });
+}
+ 
 
     saveCart();
     renderCart();
@@ -187,6 +195,7 @@ function renderCart() {
     const cartTable = document.getElementById('cartTable');
     const checkoutBtn = document.getElementById('checkoutBtn');
     cartTable.innerHTML = '';
+
     if (cart.length === 0) {
         const emptyMessage = document.createElement('p');
         emptyMessage.textContent = "Aún no has comprado nada. ¡Empecemos ahora!";
@@ -197,24 +206,42 @@ function renderCart() {
         checkoutBtn.style.display = 'none';
         return;
     }
-    // Muestra el botón si hay productos
+
     checkoutBtn.style.display = 'block';
+
     cart.forEach(item => {
+        const descuento = calcularDescuentoPorPromocion(item);
+        const precioTotal = item.precio * item.cantidad;
+        const precioConDescuento = precioTotal - descuento;
+
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${item.nombre}</td>
             <td>${item.cantidad}</td>
-            <td>$${(item.precio * item.cantidad).toFixed(2)}</td>
+            <td>
+                $${precioConDescuento.toFixed(2)}
+                ${descuento > 0 ? `<br><small style="color: green;">Descuento aplicado: -$${descuento.toFixed(2)}</small>` : ''}
+            </td>
             <td style="text-align:center;">
                 <button class="btn-mini btn-red" onclick="decreaseQuantity(${item.id_producto})">–</button>
-                <span style="margin: 0 6px;">${item.cantidad}
+                <span style="margin: 0 6px;">${item.cantidad}</span>
                 <button class="btn-mini btn-black" onclick="increaseQuantity(${item.id_producto})">+</button>
             </td>
         `;
         cartTable.appendChild(row);
     });
+
     updateTotals();
 }
+
+
+
+
+
+
+
+
+
 function increaseQuantity(id) {
     const item = cart.find(p => p.id_producto === id);
     const product = products.find(p => p.id_producto === id);

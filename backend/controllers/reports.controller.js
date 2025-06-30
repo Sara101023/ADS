@@ -240,6 +240,12 @@ reportsController.getSalesReport = async (req, res) => {
             params.push(category);
         }
 
+        if (req.query.proveedorId && req.query.proveedorId !== 'all') {
+            query += " AND p.id_proveedor = ?";
+            params.push(req.query.proveedorId);
+                }
+
+
         query += " GROUP BY v.id_venta ORDER BY v.fecha DESC";
 
         const [rows] = await pool.query(query, params);
@@ -397,11 +403,112 @@ reportsController.exportSalesPDF = async (req, res) => {
 };
 
 reportsController.getMostSoldProducts = async (req, res) => {
-    res.json([]); // o tu lógica real
+    try {
+        const [rows] = await pool.query(`
+            SELECT 
+                p.nombre AS producto,
+                p.categoria,
+                SUM(dv.cantidad) AS unidades_vendidas,
+                SUM(dv.cantidad * dv.precio_unitario) AS ingresos_generados
+            FROM detalle_venta dv
+            JOIN producto p ON dv.id_producto = p.id_producto
+            GROUP BY p.id_producto
+            ORDER BY unidades_vendidas DESC
+            LIMIT 10
+        `);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error al obtener productos más vendidos:', error);
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
 };
 
 reportsController.getPaymentMethodsReport = async (req, res) => {
-    res.json([]); // o tu lógica real
+    try {
+        const [rows] = await pool.query(`
+            SELECT 
+                mp.tipo_pago,
+                COUNT(*) AS cantidad_transacciones,
+                SUM(v.total) AS total_recaudado
+            FROM venta v
+            JOIN metodo_pago mp ON v.id_metodo_pago = mp.id_metodo_pago
+            GROUP BY mp.tipo_pago
+        `);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error al obtener métodos de pago:', error);
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+};
+
+reportsController.getProveedores = async (req, res) => {
+    try {
+        const [proveedores] = await pool.query('SELECT id_proveedor, nombre FROM proveedor');
+        res.json(proveedores);
+    } catch (err) {
+        console.error('Error al obtener proveedores:', err);
+        res.status(500).json({ error: 'Error al obtener proveedores' });
+    }
+};
+
+reportsController.getDashboardResumen = async (req, res) => {
+  try {
+    const [[ventas]] = await pool.query(`
+      SELECT 
+        COUNT(*) AS total_ventas,
+        SUM(total) AS total_ingresos,
+        SUM(subtotal) AS total_subtotal,
+        SUM(iva) AS total_iva
+      FROM venta
+    `);
+
+    const [metodos] = await pool.query(`
+      SELECT mp.tipo_pago, COUNT(*) AS cantidad
+      FROM venta v
+      JOIN metodo_pago mp ON v.id_metodo_pago = mp.id_metodo_pago
+      GROUP BY mp.tipo_pago
+    `);
+
+    const [[productos]] = await pool.query(`
+      SELECT COUNT(*) AS total_unidades FROM detalle_venta
+    `);
+
+    const [categorias] = await pool.query(`
+      SELECT p.categoria, SUM(dv.cantidad) AS unidades
+      FROM detalle_venta dv
+      JOIN producto p ON dv.id_producto = p.id_producto
+      GROUP BY p.categoria
+    `);
+
+    res.json({
+      ventas,
+      metodos,
+      productos,
+      categorias
+    });
+  } catch (err) {
+    console.error('Error en resumen del dashboard:', err);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
+reportsController.getInventoryReport = async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT 
+        p.nombre AS producto,
+        p.categoria,
+        p.stock,
+        p.precio,
+        prov.nombre AS proveedor
+      FROM producto p
+      JOIN proveedor prov ON p.id_proveedor = prov.id_proveedor
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error('Error al obtener inventario:', err);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 };
 
 
